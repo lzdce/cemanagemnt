@@ -1,114 +1,127 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Google Sheet Editor</title>
   <style>
     body {
-      font-family: sans-serif;
+      font-family: Arial, sans-serif;
+      margin: 20px;
     }
-    table, th, td {
-      border: 1px solid black;
+    table {
+      width: 100%;
       border-collapse: collapse;
+      margin-top: 10px;
     }
     th, td {
+      border: 1px solid #ccc;
       padding: 8px;
     }
     th {
-      background-color: #ccc;
-      font-size: 16px;
+      background-color: #f2f2f2;
+    }
+    input {
+      width: 100%;
+      box-sizing: border-box;
     }
     .edit-btn {
-      background: #007bff;
+      background: #28a745;
       color: white;
-      font-size: 12px;
-      padding: 4px 8px;
       border: none;
+      padding: 6px 12px;
+      font-size: 14px;
       cursor: pointer;
+      border-radius: 4px;
+    }
+    .edit-btn:hover {
+      background-color: #218838;
     }
   </style>
 </head>
 <body>
 
-<h2>Google Sheet Data</h2>
-<table id="dataTable">
-  <thead id="thead"></thead>
-  <tbody id="tbody"></tbody>
-</table>
+  <h2>Dữ liệu Google Sheet</h2>
+  <table id="dataTable">
+    <thead id="thead"></thead>
+    <tbody id="tbody"></tbody>
+  </table>
 
-<script>
-const url = 'https://script.google.com/macros/s/AKfycbwsCH2-xR4PZ2Skyzwv2gqORisaEMyj2-jjziEeqtLrFqXzAhYTY3PkpUQYt8xLtFqB6g/exec'; // ← Thay bằng link Web App của bạn
+  <script>
+    const url = 'https://script.google.com/macros/s/AKfycbwsCH2-xR4PZ2Skyzwv2gqORisaEMyj2-jjziEeqtLrFqXzAhYTY3PkpUQYt8xLtFqB6g/exec';
 
-fetch(url)
-  .then(response => response.json())
-  .then(data => {
-    const thead = document.getElementById("thead");
-    const tbody = document.getElementById("tbody");
-
-    // Tạo header
-    const headerRow = document.createElement("tr");
-    Object.keys(data[0]).forEach(key => {
-      if (key !== "_row") {
-        const th = document.createElement("th");
-        th.textContent = key;
-        headerRow.appendChild(th);
-      }
-    });
-    headerRow.appendChild(document.createElement("th")).textContent = "Action";
-    thead.appendChild(headerRow);
-
-    // Tạo từng dòng dữ liệu
-    data.forEach(item => {
-      const row = document.createElement("tr");
-
-      Object.keys(item).forEach(key => {
-        if (key !== "_row") {
-          const td = document.createElement("td");
-          const input = document.createElement("input");
-          input.value = item[key];
-          input.dataset.key = key;
-          td.appendChild(input);
-          row.appendChild(td);
+    fetch(url)
+      .then(response => response.json())
+      .then(data => {
+        if (!Array.isArray(data)) {
+          alert("Dữ liệu trả về không hợp lệ.");
+          return;
         }
+
+        const thead = document.getElementById("thead");
+        const tbody = document.getElementById("tbody");
+
+        // Tạo header
+        const headerRow = document.createElement("tr");
+        const keys = Object.keys(data[0]).filter(key => key !== "_row");
+        keys.forEach(key => {
+          const th = document.createElement("th");
+          th.textContent = key;
+          headerRow.appendChild(th);
+        });
+        const thAction = document.createElement("th");
+        thAction.textContent = "Thao tác";
+        headerRow.appendChild(thAction);
+        thead.appendChild(headerRow);
+
+        // Hiển thị dữ liệu
+        data.forEach(item => {
+          const tr = document.createElement("tr");
+
+          keys.forEach(key => {
+            const td = document.createElement("td");
+            const input = document.createElement("input");
+            input.value = item[key];
+            input.dataset.key = key;
+            td.appendChild(input);
+            tr.appendChild(td);
+          });
+
+          const tdButton = document.createElement("td");
+          const btn = document.createElement("button");
+          btn.textContent = "Lưu";
+          btn.className = "edit-btn";
+          btn.onclick = () => {
+            const inputs = tr.querySelectorAll("input");
+            const updatedData = { _row: item._row };
+            inputs.forEach(input => {
+              updatedData[input.dataset.key] = input.value;
+            });
+
+            fetch(url, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json"
+              },
+              body: JSON.stringify(updatedData)
+            })
+            .then(res => res.text())
+            .then(res => alert(res))
+            .catch(err => {
+              console.error("Lỗi khi gửi dữ liệu:", err);
+              alert("Không thể gửi dữ liệu. Vui lòng kiểm tra lại.");
+            });
+          };
+          tdButton.appendChild(btn);
+          tr.appendChild(tdButton);
+
+          tbody.appendChild(tr);
+        });
+      })
+      .catch(error => {
+        console.error("Lỗi khi kết nối Web App:", error);
+        alert("Không thể kết nối tới Web App. Có thể đang gặp vấn đề CORS.");
       });
-
-      // Nút Lưu
-      const btnTd = document.createElement("td");
-      const btn = document.createElement("button");
-      btn.textContent = "Save";
-      btn.className = "edit-btn";
-      btn.onclick = () => {
-        const inputs = row.querySelectorAll("input");
-        let updatedData = { _row: item._row };
-        inputs.forEach(input => {
-          updatedData[input.dataset.key] = input.value;
-        });
-
-        fetch(url, {
-          method: "POST",
-          body: JSON.stringify(updatedData),
-          headers: {
-            "Content-Type": "application/json"
-          }
-        })
-        .then(res => res.text())
-        .then(res => alert(res))
-        .catch(err => {
-          console.error("Lỗi khi gửi dữ liệu:", err);
-          alert("Lỗi khi gửi dữ liệu: " + err.message);
-        });
-      };
-      btnTd.appendChild(btn);
-      row.appendChild(btnTd);
-      tbody.appendChild(row);
-    });
-  })
-  .catch(error => {
-    console.error("Lỗi kết nối tới Google Sheet:", error);
-    alert("Lỗi kết nối tới Google Sheet: " + error.message);
-  });
-</script>
+  </script>
 
 </body>
 </html>
-
