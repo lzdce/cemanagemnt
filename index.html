@@ -61,7 +61,8 @@
       display: none;
       justify-content: center;
       align-items: center;
-      z-index: 1000;
+      z-index: 9999;
+      animation: fade .2s ease;
     }
 
     .modal-content {
@@ -71,6 +72,7 @@
       width: 400px;
       max-width: 90%;
       box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+      animation: zoom .25s ease;
     }
 
     .modal-content h3 {
@@ -110,6 +112,16 @@
     .cancel-btn {
       background-color: #ccc;
       color: #333;
+    }
+
+    @keyframes fade {
+      from {opacity: 0;}
+      to {opacity: 1;}
+    }
+
+    @keyframes zoom {
+      from {transform: scale(.8);}
+      to {transform: scale(1);}
     }
   </style>
 </head>
@@ -182,7 +194,10 @@
         btn.className = "edit-btn";
         btn.textContent = "✏️";
         btn.title = "Chỉnh sửa dòng này";
-        btn.onclick = () => showPopup(item);
+        btn.onclick = () => {
+          console.log('clicked', item); // for debug
+          showPopup(item);
+        };
         btnTd.appendChild(btn);
         tr.appendChild(btnTd);
 
