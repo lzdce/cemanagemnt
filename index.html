@@ -73,7 +73,7 @@
   <div id="formContainer" class="form-container" style="display:none;"></div>
 
   <script>
-    const url = 'https://script.google.com/macros/s/AKfycbwsCH2-xR4PZ2Skyzwv2gqORisaEMyj2-jjziEeqtLrFqXzAhYTY3PkpUQYt8xLtFqB6g/exec';
+    const url = 'https://lzdcemanagement.phuonghoangcao1703.workers.dev/';
     let originalData = [];
 
     fetch(url)
@@ -81,6 +81,10 @@
       .then(data => {
         originalData = data;
         renderTable(data);
+      })
+      .catch(error => {
+        alert('Không thể tải dữ liệu từ Worker. Vui lòng kiểm tra lại URL hoặc kết nối mạng.');
+        console.error(error);
       });
 
     function renderTable(data) {
@@ -152,7 +156,11 @@
           body: JSON.stringify(updatedData)
         })
         .then(res => res.text())
-        .then(res => alert(res));
+        .then(res => alert(res))
+        .catch(error => {
+          alert('Có lỗi khi gửi dữ liệu. Vui lòng kiểm tra lại.');
+          console.error(error);
+        });
       };
 
       form.appendChild(saveBtn);
