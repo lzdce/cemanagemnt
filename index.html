@@ -31,9 +31,21 @@
     let originalData = [];
 
     fetch(url)
-      .then(r => r.json())
-      .then(data => { originalData = data; renderTable(data); })
-      .catch(err => alert('Không lấy được dữ liệu: ' + err));
+  .then(r => r.json())
+  .then(data => {
+    console.log('📦 Data nhận được:', data);      // Kiểm tra trên Console
+    if (Array.isArray(data)) {
+      originalData = data;
+      renderTable(data);
+    } else {
+      document.body.innerHTML = '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
+    }
+  })
+  .catch(err => {
+    console.error('❌ Lỗi fetch:', err);
+    document.body.innerHTML = '<p style="color:red">Không thể load dữ liệu: ' + err + '</p>';
+  });
+
 
     function renderTable(data) {
       const thead = document.getElementById('thead');
@@ -115,3 +127,4 @@
 
 </body>
 </html>
+
