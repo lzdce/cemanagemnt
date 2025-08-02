@@ -1,293 +1,152 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <title>CE MANAGEMENT</title>
-
-  <!-- ========== 👗 CSS ========== -->
-  <style>
-    /* Page */
-    body{
-      font-family:'Segoe UI',sans-serif;
-      margin:40px;
-      background:#f4f6f8;
-      color:#333;
-    }
-
-    h2{margin-bottom:16px;}
-
-    /* Search */
-    input[type="text"]{
-      padding:10px 14px;
-      width:300px;
-      font-size:15px;
-      border:1px solid #ccc;
-      border-radius:6px;
-      margin-bottom:20px;
-    }
-
-    /* Table */
-    table{
-      width:100%;
-      border-collapse:collapse;
-      background:#fff;
-      border-radius:8px;
-      overflow:hidden;
-      box-shadow:0 1px 3px rgba(0,0,0,.05);
-    }
-    th,td{
-      padding:12px 14px;
-      border-bottom:1px solid #eee;
-      text-align:left;
-    }
-    th{
-      background:#f0f2f5;
-      font-weight:600;
-    }
-    tr:hover{background:#fafafa;}
-
-    /* Edit button */
-    .edit-btn{
-      background:transparent;
-      border:none;
-      cursor:pointer;
-      font-size:16px;
-      color:#007bff;
-    }
-    .edit-btn:hover{color:#0056b3;}
-
-    /* Aging badge */
-    .badge{
-      display:inline-block;
-      min-width:48px;
-      text-align:center;
-      padding:4px 8px;
-      border-radius:12px;
-      font-weight:600;
-      color:#fff;
-    }
-
-    /* Popup modal */
-    .modal-overlay{
-      position:fixed;
-      inset:0;
-      background:rgba(0,0,0,.4);
-      display:none;
-      justify-content:center;
-      align-items:center;
-      z-index:9999;
-      animation:fade .2s ease;
-    }
-    .modal-content{
-      background:#fff;
-      padding:24px;
-      border-radius:10px;
-      width:400px;
-      max-width:90%;
-      box-shadow:0 8px 24px rgba(0,0,0,.2);
-      animation:zoom .25s ease;
-    }
-    .modal-content h3{margin:0 0 16px;font-size:18px;}
-
-    .modal-content input{
-      width:100%;
-      padding:10px;
-      margin-bottom:12px;
-      border-radius:6px;
-      border:1px solid #ccc;
-      font-size:14px;
-    }
-
-    .modal-actions{text-align:right;margin-top:12px;}
-    .modal-actions button{
-      padding:8px 14px;
-      font-size:14px;
-      margin-left:8px;
-      border:none;
-      border-radius:6px;
-      cursor:pointer;
-    }
-    .save-btn{background:#28a745;color:#fff;}
-    .cancel-btn{background:#ccc;color:#333;}
-
-    @keyframes fade{from{opacity:0;}to{opacity:1;}}
-    @keyframes zoom{from{transform:scale(.8);}to{transform:scale(1);}}
-  </style>
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
+<body class="bg-gray-100 p-8">
+  <h2 class="text-2xl font-semibold mb-6">Dashboard Google Sheet</h2>
+  <input type="text" id="searchInput" placeholder="Tìm kiếm..." class="mb-6 px-4 py-2 border rounded w-80">
 
-<body>
-  <h2>Dashboard Google Sheet</h2>
-  <input type="text" id="searchInput" placeholder="Tìm kiếm..." />
-
-  <table id="dataTable">
-    <thead id="thead"></thead>
+  <table class="w-full bg-white rounded shadow mb-6">
+    <thead id="thead" class="bg-gray-50"></thead>
     <tbody id="tbody"></tbody>
   </table>
 
-  <!-- ======= Popup form ======= -->
-  <div id="popupForm" class="modal-overlay">
-    <div class="modal-content">
-      <h3>Chỉnh sửa dòng</h3>
-      <div id="popupFields"></div>
-      <div class="modal-actions">
-        <button class="cancel-btn" onclick="closePopup()">Huỷ</button>
-        <button class="save-btn" onclick="submitPopup()">Lưu</button>
-      </div>
-    </div>
-  </div>
+  <!-- Accordion details -->
+  <div id="accordionContainer" class="max-w-screen-xl mx-auto space-y-4 hidden"></div>
 
-  <!-- ========== 🤖 SCRIPT ========== -->
   <script>
-    /************** 1. CONFIG **************/
     const url = 'https://lzdcemanagement.phuonghoangcao1703.workers.dev/';
-    const DATE_FIELD = 'Date received';   // tên cột ngày nhận trên Google Sheet
+    let originalData = [];
+    let currentItem = {};
 
-    /************** 2. GLOBAL STATE **************/
-    let originalData = [];   // dữ liệu gốc từ API
-    let currentItem  = {};   // item đang mở popup chỉnh sửa
-
-    /************** 3. FETCH + RENDER TABLE **************/
     fetch(url)
       .then(r => r.json())
       .then(data => {
-        originalData = normalizeData(data);
+        originalData = Array.isArray(data) ? data : [data];
         renderTable(originalData);
       });
 
-    function normalizeData(data){
-      return Array.isArray(data) ? data : [data];
-    }
+    function renderTable(data) {
+      const thead = document.getElementById("thead");
+      const tbody = document.getElementById("tbody");
+      thead.innerHTML = '';
+      tbody.innerHTML = '';
 
-    /** TÍNH SỐ NGÀY TỒN ĐỌNG */
-    function calculateAging(dateStr){
-      const received = new Date(dateStr);
-      const today    = new Date();
-      const diff     = Math.floor((today - received) / (1000*60*60*24));
-      return isFinite(diff) && diff >= 0 ? diff : '-';
-    }
+      if (!data.length) return;
 
-    /** CHỌN MÀU THEO SỐ NGÀY */
-    function getAgingColor(days){
-      if(days === '-')            return '#6c757d';    // xám (không hợp lệ)
-      if(days <= 3)               return '#22c55e';    // xanh
-      if(days <= 7)               return '#eab308';    // vàng
-      return '#ef4444';                             // đỏ
-    }
-
-    /** RENDER TABLE */
-    function renderTable(data){
-      const thead = document.getElementById('thead');
-      const tbody = document.getElementById('tbody');
-      thead.innerHTML = ''; tbody.innerHTML = '';
-      if(!data.length) return;
-
-      /* ----- Header ----- */
       const keys = Object.keys(data[0]);
-      const headerRow = document.createElement('tr');
+      const header = document.createElement("tr");
+      header.innerHTML = `<th class="px-4 py-2">✏️</th>` + keys.map(k => `<th class="px-4 py-2">${k}</th>`).join('');
+      thead.appendChild(header);
 
-      const thAction = document.createElement('th');
-      thAction.textContent = '✏️';
-      headerRow.appendChild(thAction);
-
-      keys.forEach(k=>{
-        const th = document.createElement('th');
-        th.textContent = k;
-        headerRow.appendChild(th);
-      });
-
-      // Thêm cột Aging backlog
-      const thAging = document.createElement('th');
-      thAging.textContent = 'Aging backlog';
-      headerRow.appendChild(thAging);
-
-      thead.appendChild(headerRow);
-
-      /* ----- Body ----- */
-      data.forEach(item=>{
-        const tr = document.createElement('tr');
-
-        // Edit button
-        const btnTd = document.createElement('td');
-        const btn   = document.createElement('button');
-        btn.className = 'edit-btn';
-        btn.textContent = '✏️';
-        btn.title = 'Chỉnh sửa dòng này';
-        btn.onclick = ()=>showPopup(item);
-        btnTd.appendChild(btn);
+      data.forEach(item => {
+        const tr = document.createElement("tr");
+        const btnTd = document.createElement("td");
+        btnTd.innerHTML = `<button class="text-blue-600 hover:underline" onclick='showDetails(${JSON.stringify(JSON.stringify(item) )})'>✏️</button>`;
         tr.appendChild(btnTd);
-
-        // Data cells
-        keys.forEach(k=>{
-          const td = document.createElement('td');
+        keys.forEach(k => {
+          const td = document.createElement("td");
+          td.className = "px-4 py-2 border-t";
           td.textContent = item[k];
           tr.appendChild(td);
         });
-
-        // Aging backlog cell
-        const agingDays = calculateAging(item[DATE_FIELD]);
-        const tdAging   = document.createElement('td');
-        const badge     = document.createElement('span');
-        badge.className = 'badge';
-        badge.style.background = getAgingColor(agingDays);
-        badge.textContent = agingDays === '-' ? '-' : `${agingDays}d`;
-        tdAging.appendChild(badge);
-        tr.appendChild(tdAging);
-
         tbody.appendChild(tr);
       });
     }
 
-    /************** 4. POPUP EDIT **************/
-    function showPopup(item){
+    function showDetails(encodedItem) {
+      const item = JSON.parse(JSON.parse(encodedItem));
       currentItem = item;
-      const container = document.getElementById('popupFields');
-      container.innerHTML = '';
+      const aging = calculateAging(item["Date received"]);
+      const agingColor = getColor(aging);
 
-      Object.keys(item).forEach(k=>{
-        if(k === '_row') return;
-        const input = document.createElement('input');
-        input.value = item[k];
-        input.dataset.key = k;
-        container.appendChild(input);
-      });
-      document.getElementById('popupForm').style.display = 'flex';
+      const accordion = `
+        <details open class="bg-white rounded shadow p-4">
+          <summary class="font-semibold text-lg cursor-pointer">📦 Thông tin Case</summary>
+          <div class="grid grid-cols-3 gap-4 mt-4 text-gray-700 text-sm">
+            <div><strong>Owner:</strong> ${item["Owner name"] || ''}</div>
+            <div><strong>ID:</strong> ${item["ID"] || ''}</div>
+            <div><strong>Tracking:</strong> ${item["Tracking"] || ''}</div>
+            <div><strong>Tracking CR:</strong> ${item["Tracking CR"] || ''}</div>
+            <div><strong>Type:</strong> <span class="${item["Type"]==='CR' ? 'bg-red-500' : 'bg-green-500'} text-white px-2 py-1 rounded">${item["Type"] || ''}</span></div>
+            <div><strong>Description:</strong> ${item["Description"] || ''}</div>
+            <div><strong>Video OB:</strong> ${item["Video OB"] ? `<button onclick="copyLink('${item["Video OB"]}')" class="text-blue-600 hover:underline">Copy link</button>` : 'Chưa update'}</div>
+            <div><strong>Date received:</strong> ${item["Date received"] || ''}</div>
+            <div><strong>Aging backlog:</strong> <span class="px-2 py-1 rounded font-semibold" style="background:${agingColor};color:white;">${aging} ngày</span></div>
+            <div><strong>Brief case:</strong> ${item["Brief case"] || ''}</div>
+          </div>
+        </details>
+
+        <details class="bg-white rounded shadow p-4">
+          <summary class="font-semibold text-lg cursor-pointer">🛠 Xử lý & Cập nhật</summary>
+          <div class="grid grid-cols-3 gap-4 mt-4 text-sm">
+            <input type="date" class="border p-2 rounded" value="${item["Created date"] || ''}" placeholder="Created date">
+            <input type="date" class="border p-2 rounded" value="${item["Final date"] || ''}" placeholder="Final date">
+            <input type="text" class="border p-2 rounded" value="${item["Reason dispute"] || ''}" placeholder="Reason dispute">
+            <select class="border p-2 rounded bg-blue-100">
+              ${renderStatus(item["CE Status"])}
+            </select>
+            <input type="number" class="border p-2 rounded" value="${item["Feedback count"] || ''}" placeholder="Feedback count">
+            <input type="date" class="border p-2 rounded" value="${item["Last feedback date"] || ''}" placeholder="Last feedback date">
+            <input type="date" class="border p-2 rounded" value="${item["Last checked date"] || ''}" placeholder="Last checked date">
+          </div>
+          <div class="mt-4 flex justify-end space-x-2">
+            <button class="bg-cyan-600 text-white px-4 py-2 rounded hover:bg-cyan-700">Save</button>
+            <button class="bg-gray-200 px-4 py-2 rounded hover:bg-gray-300" onclick="checkNoFeedback()">Checked no feedback</button>
+          </div>
+        </details>
+      `;
+
+      const container = document.getElementById("accordionContainer");
+      container.innerHTML = accordion;
+      container.classList.remove("hidden");
     }
 
-    function closePopup(){
-      document.getElementById('popupForm').style.display = 'none';
+    function calculateAging(dateStr){
+      const received = new Date(dateStr);
+      const today = new Date();
+      const diff = Math.floor((today - received)/(1000*60*60*24));
+      return isFinite(diff) && diff >= 0 ? diff : '-';
     }
 
-    function submitPopup(){
-      const inputs = document.querySelectorAll('#popupFields input');
-      const updated = { _row: currentItem._row };
-      inputs.forEach(i=> updated[i.dataset.key] = i.value );
-
-      fetch(url,{
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body:JSON.stringify(updated)
-      })
-      .then(r=>r.text())
-      .then(res=>{
-        alert(res);
-        closePopup();
-        // reload
-        fetch(url)
-          .then(r=>r.json())
-          .then(data=>{
-            originalData = normalizeData(data);
-            renderTable(originalData);
-          });
-      });
+    function getColor(days){
+      if(days === '-') return '#6c757d';
+      if(days <=3) return '#22c55e';
+      if(days <=7) return '#eab308';
+      return '#ef4444';
     }
 
-    /************** 5. SEARCH FILTER **************/
-    document.getElementById('searchInput')
-            .addEventListener('input', e=>{
-      const kw = e.target.value.toLowerCase();
-      const filtered = originalData.filter(row=>
-        Object.values(row).some(v=>
-          typeof v === 'string' && v.toLowerCase().includes(kw)
+    function renderStatus(selected){
+      const options = [
+        {label: 'Created', color: 'bg-blue-100'},
+        {label: 'Being process', color: 'bg-yellow-100'},
+        {label: 'Appeal success', color: 'bg-green-100'},
+        {label: 'Appeal reject', color: 'bg-red-100'},
+        {label: 'Do not claim', color: 'bg-gray-100'},
+        {label: 'Need to follow', color: 'bg-purple-100'},
+        {label: 'Closed', color: 'bg-black text-white'}
+      ];
+      return options.map(opt => `<option class="${opt.color}" ${opt.label === selected ? 'selected':''}>${opt.label}</option>`).join('');
+    }
+
+    function copyLink(link){
+      navigator.clipboard.writeText(link);
+      alert("Đã copy: " + link);
+    }
+
+    function checkNoFeedback(){
+      alert("Đã checked. Cập nhật Last checked date = " + new Date().toLocaleDateString());
+      // xử lý logic lưu nếu cần
+    }
+
+    document.getElementById("searchInput").addEventListener("input", function() {
+      const keyword = this.value.toLowerCase();
+      const filtered = originalData.filter(item =>
+        Object.values(item).some(val =>
+          typeof val === "string" && val.toLowerCase().includes(keyword)
         )
       );
       renderTable(filtered);
