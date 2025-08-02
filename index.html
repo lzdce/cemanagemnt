@@ -2,7 +2,7 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8" />
-  <title>CE EDIT</title>
+  <title>CE MANAGEMENT</title>
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
@@ -10,12 +10,9 @@
       background-color: #f4f6f8;
       color: #333;
     }
-
     h2 {
-      color: #222;
       margin-bottom: 16px;
     }
-
     input[type="text"] {
       padding: 10px 14px;
       width: 300px;
@@ -24,32 +21,26 @@
       border-radius: 6px;
       margin-bottom: 20px;
     }
-
     table {
       width: 100%;
       border-collapse: collapse;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
       background: white;
       border-radius: 8px;
       overflow: hidden;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
     }
-
     th, td {
       padding: 12px 14px;
       border-bottom: 1px solid #eee;
       text-align: left;
     }
-
     th {
       background-color: #f0f2f5;
-      color: #555;
       font-weight: 600;
     }
-
     tr:hover {
       background-color: #fafafa;
     }
-
     .edit-btn {
       background: transparent;
       border: none;
@@ -57,43 +48,68 @@
       font-size: 16px;
       color: #007bff;
     }
-
     .edit-btn:hover {
       color: #0056b3;
     }
 
-    .form-container {
-      margin-top: 30px;
-      padding: 20px;
-      background: #fff;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    /* Popup modal styles */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.4);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
     }
 
-    .form-container input {
-      display: block;
+    .modal-content {
+      background: #fff;
+      padding: 24px;
+      border-radius: 10px;
+      width: 400px;
+      max-width: 90%;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+    }
+
+    .modal-content h3 {
+      margin-top: 0;
+      font-size: 18px;
+      margin-bottom: 16px;
+    }
+
+    .modal-content input {
       width: 100%;
-      margin-bottom: 14px;
       padding: 10px;
-      font-size: 14px;
+      margin-bottom: 12px;
       border-radius: 6px;
       border: 1px solid #ccc;
+      font-size: 14px;
+    }
+
+    .modal-actions {
+      text-align: right;
+      margin-top: 12px;
+    }
+
+    .modal-actions button {
+      padding: 8px 14px;
+      font-size: 14px;
+      margin-left: 8px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
     }
 
     .save-btn {
-      background: #28a745;
+      background-color: #28a745;
       color: white;
-      border: none;
-      padding: 10px 16px;
-      border-radius: 6px;
-      font-size: 15px;
-      cursor: pointer;
-      transition: background 0.2s;
     }
 
-    .save-btn:hover {
-      background: #218838;
+    .cancel-btn {
+      background-color: #ccc;
+      color: #333;
     }
   </style>
 </head>
@@ -106,38 +122,32 @@
     <tbody id="tbody"></tbody>
   </table>
 
-  <div id="formContainer" class="form-container" style="display:none;"></div>
+  <!-- Popup form -->
+  <div id="popupForm" class="modal-overlay">
+    <div class="modal-content">
+      <h3>Chỉnh sửa dòng</h3>
+      <div id="popupFields"></div>
+      <div class="modal-actions">
+        <button class="cancel-btn" onclick="closePopup()">Huỷ</button>
+        <button class="save-btn" onclick="submitPopup()">Lưu</button>
+      </div>
+    </div>
+  </div>
 
   <script>
     const url = 'https://lzdcemanagement.phuonghoangcao1703.workers.dev/';
     let originalData = [];
+    let currentItem = {};
 
     fetch(url)
       .then(r => r.json())
       .then(data => {
         originalData = normalizeData(data);
         renderTable(originalData);
-      })
-      .catch(err => {
-        console.error('❌ Lỗi fetch:', err);
-        document.body.innerHTML = '<p style="color:red">Không thể tải dữ liệu: ' + err + '</p>';
       });
 
     function normalizeData(data) {
       if (!Array.isArray(data)) data = [data];
-
-      if (Array.isArray(data[0]) && !data[0].every(val => typeof val === 'object')) {
-        const result = [];
-        for (let i = 1; i < data.length; i++) {
-          const obj = {};
-          data[0].forEach((key, idx) => {
-            obj[key] = data[i][idx];
-          });
-          result.push(obj);
-        }
-        return result;
-      }
-
       return data;
     }
 
@@ -147,10 +157,7 @@
       thead.innerHTML = '';
       tbody.innerHTML = '';
 
-      if (!data.length) {
-        thead.innerHTML = '<tr><th>Không có dữ liệu</th></tr>';
-        return;
-      }
+      if (!data.length) return;
 
       const keys = Object.keys(data[0]);
       const headerRow = document.createElement("tr");
@@ -175,7 +182,7 @@
         btn.className = "edit-btn";
         btn.textContent = "✏️";
         btn.title = "Chỉnh sửa dòng này";
-        btn.onclick = () => showEditForm(item);
+        btn.onclick = () => showPopup(item);
         btnTd.appendChild(btn);
         tr.appendChild(btnTd);
 
@@ -189,49 +196,49 @@
       });
     }
 
-    function showEditForm(item) {
-      const container = document.getElementById("formContainer");
+    function showPopup(item) {
+      currentItem = item;
+      const container = document.getElementById("popupFields");
       container.innerHTML = '';
-      container.style.display = 'block';
 
-      const form = document.createElement("div");
-      const keys = Object.keys(item);
-
-      keys.forEach(key => {
+      Object.keys(item).forEach(k => {
+        if (k === "_row") return;
         const input = document.createElement("input");
-        input.value = item[key];
-        input.dataset.key = key;
-        form.appendChild(input);
+        input.value = item[k];
+        input.dataset.key = k;
+        container.appendChild(input);
       });
 
-      const saveBtn = document.createElement("button");
-      saveBtn.className = "save-btn";
-      saveBtn.textContent = "Lưu";
-      saveBtn.onclick = () => {
-        const inputs = form.querySelectorAll("input");
-        const updatedData = {};
-        inputs.forEach(input => {
-          updatedData[input.dataset.key] = input.value;
-        });
+      document.getElementById("popupForm").style.display = "flex";
+    }
 
-        fetch(url, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(updatedData)
-        })
-        .then(res => res.text())
-        .then(res => {
-          alert(res);
-          container.style.display = 'none';
-        })
-        .catch(error => {
-          alert('Có lỗi khi gửi dữ liệu: ' + error);
-          console.error(error);
-        });
-      };
+    function closePopup() {
+      document.getElementById("popupForm").style.display = "none";
+    }
 
-      form.appendChild(saveBtn);
-      container.appendChild(form);
+    function submitPopup() {
+      const inputs = document.querySelectorAll("#popupFields input");
+      const updatedData = { _row: currentItem._row };
+      inputs.forEach(input => {
+        updatedData[input.dataset.key] = input.value;
+      });
+
+      fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updatedData)
+      })
+      .then(res => res.text())
+      .then(res => {
+        alert(res);
+        closePopup();
+        fetch(url)
+          .then(r => r.json())
+          .then(data => {
+            originalData = normalizeData(data);
+            renderTable(originalData);
+          });
+      });
     }
 
     document.getElementById("searchInput").addEventListener("input", function() {
@@ -244,6 +251,5 @@
       renderTable(filtered);
     });
   </script>
-
 </body>
 </html>
