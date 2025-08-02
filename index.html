@@ -2,69 +2,23 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8" />
-  <title>Google Sheet Finder</title>
+  <title>Google Sheet Dashboard</title>
   <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      margin: 30px;
-      background-color: #f8f9fa;
-    }
-    input[type="text"] {
-      padding: 8px;
-      width: 300px;
-      font-size: 16px;
-      margin-bottom: 20px;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-bottom: 30px;
-    }
-    th, td {
-      border: 1px solid #ddd;
-      padding: 10px;
-    }
-    th {
-      background-color: #e9ecef;
-      text-align: left;
-    }
-    .edit-btn {
-      background: #007bff;
-      color: white;
-      border: none;
-      padding: 6px 12px;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-    .form-container {
-      background: #fff;
-      border: 1px solid #ccc;
-      padding: 20px;
-      margin-top: -10px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    }
-    .form-container input {
-      display: block;
-      width: 100%;
-      margin-bottom: 12px;
-      padding: 8px;
-      font-size: 15px;
-    }
-    .save-btn {
-      background: #28a745;
-      color: white;
-      border: none;
-      padding: 8px 16px;
-      border-radius: 4px;
-      font-size: 16px;
-      cursor: pointer;
-    }
+    body { font-family: 'Segoe UI', sans-serif; margin: 30px; background:#f8f9fa; }
+    input[type="text"] { padding:8px; width:300px; font-size:16px; margin-bottom:20px; }
+    table { width:100%; border-collapse:collapse; margin-bottom:30px; }
+    th,td { border:1px solid #ddd; padding:10px; }
+    th { background:#e9ecef; text-align:left; }
+    .edit-btn { background:#007bff; color:#fff; border:none; padding:6px 12px; border-radius:4px; cursor:pointer; }
+    .form-container { background:#fff; border:1px solid #ccc; padding:20px; margin-top:-10px; box-shadow:0 2px 8px rgba(0,0,0,0.1); }
+    .form-container input { display:block; width:100%; margin-bottom:12px; padding:8px; font-size:15px; }
+    .save-btn { background:#28a745; color:#fff; border:none; padding:8px 16px; border-radius:4px; font-size:16px; cursor:pointer; }
   </style>
 </head>
 <body>
 
-  <h2>Dữ liệu Google Sheet</h2>
-  <input type="text" id="searchInput" placeholder="Tìm kiếm dữ liệu..." />
+  <h2>Dashboard Google Sheet</h2>
+  <input type="text" id="searchInput" placeholder="Tìm kiếm..." />
   <table id="dataTable">
     <thead id="thead"></thead>
     <tbody id="tbody"></tbody>
@@ -77,104 +31,85 @@
     let originalData = [];
 
     fetch(url)
-      .then(response => response.json())
-      .then(data => {
-        originalData = data;
-        renderTable(data);
-      })
-      .catch(error => {
-        alert('Không thể tải dữ liệu từ Worker. Vui lòng kiểm tra lại URL hoặc kết nối mạng.');
-        console.error(error);
-      });
+      .then(r => r.json())
+      .then(data => { originalData = data; renderTable(data); })
+      .catch(err => alert('Không lấy được dữ liệu: ' + err));
 
     function renderTable(data) {
-      const thead = document.getElementById("thead");
-      const tbody = document.getElementById("tbody");
-      thead.innerHTML = '';
-      tbody.innerHTML = '';
+      const thead = document.getElementById('thead');
+      const tbody = document.getElementById('tbody');
+      thead.innerHTML = tbody.innerHTML = '';
 
-      const keys = Object.keys(data[0]).filter(k => k !== "_row");
-      const headerRow = document.createElement("tr");
+      if (!data.length) return;
+
+      const keys = Object.keys(data[0]).filter(k => k !== '_row');
+      const trHead = document.createElement('tr');
       keys.forEach(k => {
-        const th = document.createElement("th");
+        const th = document.createElement('th');
         th.textContent = k;
-        headerRow.appendChild(th);
+        trHead.appendChild(th);
       });
-      const thAction = document.createElement("th");
-      thAction.textContent = "🖋️";
-      headerRow.appendChild(thAction);
-      thead.appendChild(headerRow);
+      const thAct = document.createElement('th'); thAct.textContent = '✎';
+      trHead.appendChild(thAct); thead.appendChild(trHead);
 
       data.forEach(item => {
-        const tr = document.createElement("tr");
+        const tr = document.createElement('tr');
         keys.forEach(k => {
-          const td = document.createElement("td");
-          td.textContent = item[k];
-          tr.appendChild(td);
+          const td = document.createElement('td');
+          td.textContent = item[k]; tr.appendChild(td);
         });
-
-        const btnTd = document.createElement("td");
-        const btn = document.createElement("button");
-        btn.className = "edit-btn";
-        btn.textContent = "🖋️";
+        const tdBtn = document.createElement('td');
+        const btn = document.createElement('button');
+        btn.className = 'edit-btn'; btn.textContent = '✎';
         btn.onclick = () => showEditForm(item);
-        btnTd.appendChild(btn);
-        tr.appendChild(btnTd);
-
+        tdBtn.appendChild(btn); tr.appendChild(tdBtn);
         tbody.appendChild(tr);
       });
     }
 
     function showEditForm(item) {
-      const container = document.getElementById("formContainer");
-      container.innerHTML = '';
-      container.style.display = 'block';
+      const container = document.getElementById('formContainer');
+      container.style.display = 'block'; container.innerHTML = '';
+      const form = document.createElement('div');
+      const keys = Object.keys(item).filter(k => k !== '_row');
 
-      const form = document.createElement("div");
-      const keys = Object.keys(item).filter(k => k !== "_row");
-
-      keys.forEach(key => {
-        const input = document.createElement("input");
-        input.value = item[key];
-        input.dataset.key = key;
-        form.appendChild(input);
+      keys.forEach(k => {
+        const input = document.createElement('input');
+        input.dataset.key = k; input.value = item[k]; form.appendChild(input);
       });
 
-      const saveBtn = document.createElement("button");
-      saveBtn.className = "save-btn";
-      saveBtn.textContent = "Lưu";
-      saveBtn.onclick = () => {
-        const inputs = form.querySelectorAll("input");
-        const updatedData = { _row: item._row };
-        inputs.forEach(input => {
-          updatedData[input.dataset.key] = input.value;
-        });
+      const save = document.createElement('button');
+      save.className = 'save-btn'; save.textContent = 'Lưu';
+      save.onclick = () => {
+        const inputs = form.querySelectorAll('input');
+        const payload = { _row: item._row };
+        inputs.forEach(i => payload[i.dataset.key] = i.value);
 
         fetch(url, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(updatedData)
+          method:'POST',
+          headers:{ 'Content-Type':'application/json' },
+          body:JSON.stringify(payload)
         })
-        .then(res => res.text())
-        .then(res => alert(res))
-        .catch(error => {
-          alert('Có lỗi khi gửi dữ liệu. Vui lòng kiểm tra lại.');
-          console.error(error);
-        });
+        .then(r => r.text())
+        .then(msg => {
+          alert(msg);
+          return fetch(url).then(r => r.json()).then(d => {
+            originalData = d; renderTable(d); container.style.display='none';
+          });
+        })
+        .catch(err => alert('Lỗi gửi dữ liệu: ' + err));
       };
 
-      form.appendChild(saveBtn);
-      container.appendChild(form);
+      form.appendChild(save); container.appendChild(form);
     }
 
-    document.getElementById("searchInput").addEventListener("input", function() {
-      const keyword = this.value.toLowerCase();
-      const filtered = originalData.filter(item =>
-        Object.values(item).some(val =>
-          typeof val === "string" && val.toLowerCase().includes(keyword)
+    document.getElementById('searchInput').addEventListener('input', e => {
+      const kw = e.target.value.toLowerCase();
+      renderTable(originalData.filter(o =>
+        Object.values(o).some(v =>
+          typeof v === 'string' && v.toLowerCase().includes(kw)
         )
-      );
-      renderTable(filtered);
+      ));
     });
   </script>
 
