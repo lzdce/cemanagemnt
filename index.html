@@ -28,23 +28,32 @@
 </table>
 
 <script>
-const url = 'https://script.google.com/macros/s/AKfycby07HICDhLeW24m9rcZmGMZF_FzMB9dtQKuQT-Egwg3tn-bQwzPP58Syyn1rbYU8iOF6A/exec'; // thay bằng URL thật
+const url = 'https://script.google.com/macros/s/AKfycby07HICDhLeW24m9rcZmGMZF_FzMB9dtQKuQT-Egwg3tn-bQwzPP58Syyn1rbYU8iOF6A/exec';
 
-// Load dữ liệu từ Google Sheet
-fetch("https://script.google.com/macros/s/AKfycby07HICDhLeW24m9rcZmGMZF_FzMB9dtQKuQT-Egwg3tn-bQwzPP58Syyn1rbYU8iOF6A/exec")
+fetch(url)
   .then(response => response.json())
   .then(data => {
     console.log("Dữ liệu từ Google Sheet:", data);
-    // ở đây bạn có thể tiếp tục xử lý dữ liệu: render table, list,...
-  })
-  .catch(error => {
-    console.error("Lỗi kết nối tới Google Sheet:", error);
-  });
+
+    const table = document.getElementById("dataTable");
+    const thead = table.querySelector("thead");
+    const tbody = table.querySelector("tbody");
+
+    // Tạo header
+    const headerRow = document.createElement("tr");
+    Object.keys(data[0]).forEach(key => {
+      if (key !== "_row") {
+        const th = document.createElement("th");
+        th.textContent = key;
+        headerRow.appendChild(th);
+      }
     });
-    headerRow.appendChild(document.createElement("th")).textContent = "Action";
+    const actionTh = document.createElement("th");
+    actionTh.textContent = "Action";
+    headerRow.appendChild(actionTh);
     thead.appendChild(headerRow);
 
-    // Rows
+    // Tạo các dòng dữ liệu
     data.forEach(item => {
       const row = document.createElement("tr");
       Object.keys(item).forEach(key => {
@@ -58,7 +67,7 @@ fetch("https://script.google.com/macros/s/AKfycby07HICDhLeW24m9rcZmGMZF_FzMB9dtQ
         }
       });
 
-      // Save Button
+      // Nút Save
       const btnTd = document.createElement("td");
       const btn = document.createElement("button");
       btn.textContent = "Save";
@@ -80,19 +89,20 @@ fetch("https://script.google.com/macros/s/AKfycby07HICDhLeW24m9rcZmGMZF_FzMB9dtQ
         .then(res => res.text())
         .then(res => alert(res))
         .catch(err => {
-  console.error("Lỗi khi gửi dữ liệu:", err);
-  alert("Lỗi kết nối tới Google Sheet: " + err.message);
-});
+          console.error("Lỗi khi gửi dữ liệu:", err);
+          alert("Lỗi kết nối tới Google Sheet: " + err.message);
+        });
       };
       btnTd.appendChild(btn);
       row.appendChild(btnTd);
       tbody.appendChild(row);
     });
   })
-  .catch(err => alert("Error: " + err));
+  .catch(error => {
+    console.error("Lỗi kết nối tới Google Sheet:", error);
+    alert("Không thể lấy dữ liệu: " + error.message);
+  });
 </script>
 
 </body>
 </html>
-
-
