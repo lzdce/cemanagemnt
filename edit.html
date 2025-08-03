@@ -173,6 +173,7 @@
     const raw   = sessionStorage.getItem('editItem');
     if (!raw) { alert('Không tìm thấy dữ liệu'); window.close(); }
     const item  = JSON.parse(raw);
+    item._row=sheetRow['_row'];
     const orig  = {};   // Lưu giá trị gốc để so sánh
 
     // --- Fill Information ---
@@ -276,19 +277,28 @@
 
     /***** Gửi cập nhật đến Cloudflare Worker *****/
     async function pushToSheet(obj) {
-      const res = await fetch('https://lzdcemanagement.phuonghoangcao1703.workers.dev/update', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(obj)
-      });
-      if (!res.ok) {
-        const t = await res.text();
-        alert('Không thể cập nhật Google Sheet: ' + t);
-        throw new Error(t);
-      }
-    }
+  // Kiểm tra giá trị _row trước khi gửi
+  if (!obj._row || obj._row === 0) {
+    alert('Dữ liệu không chứa giá trị _row hợp lệ!');
+    return;
+  }
+
+  // Gửi request cập nhật tới Cloudflare Worker
+  const res = await fetch('https://lzdcemanagement.phuonghoangcao1703.workers.dev/update', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(obj)
+  });
+
+  if (!res.ok) {
+    const t = await res.text();
+    alert('Không thể cập nhật Google Sheet: ' + t);
+    throw new Error(t);
+  }
+}
   </script>
 </body>
 </html>
+
 
 
