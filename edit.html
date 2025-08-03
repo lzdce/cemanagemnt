@@ -215,8 +215,19 @@
       vBox.textContent = 'Chưa update';
     }
 
-   // Dữ liệu ban đầu kiểu dd/mm/yyyy
-    document.getElementById('dateReceived').value    = item['Date received'] || '';
+   // Data received
+    function isoToDMY(isoString) {
+  const d = new Date(isoString);
+  if (isNaN(d)) return '';   // trả về chuỗi rỗng nếu invalid date
+
+  const dd = String(d.getDate()).padStart(2, '0');
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const yyyy = d.getFullYear();
+
+  return `${dd}/${mm}/${yyyy}`;
+}
+    const formatted = isoToDMY(item['Data received']);   // "21/05/2025"
+document.getElementById('dateReceived').value = formatted;
 
 
 // Tách ngày để tính aging
@@ -333,6 +344,7 @@ document.getElementById('aging').textContent = `${days} ngày`;
   </script>
 </body>
 </html>
+
 
 
 
