@@ -69,39 +69,33 @@
     }
 
     function openNewTabWithDetails(item) {
-      const aging = calculateAging(item["Date received"]);
-      const agingColor = getColor(aging);
+  const win = window.open('', '_blank');
 
-      const win = window.open('', '_blank');
-      win.document.write(`
-        <!DOCTYPE html>
-        <html lang="vi">
-        <head>
-          <meta charset="UTF-8">
-          <title>Chi tiết Case</title>
-          <script src="https://cdn.tailwindcss.com"></script>
-        </head>
-        <body class="p-6 bg-gray-100 text-sm text-gray-800">
-          <h2 class="text-xl font-semibold mb-4">📦 Thông tin Chi tiết</h2>
-          <div class="grid grid-cols-2 gap-4 mb-6">
-            <div><strong>Owner:</strong> ${item["Owner name"] || ''}</div>
-            <div><strong>ID:</strong> ${item["ID"] || ''}</div>
-            <div><strong>Tracking:</strong> ${item["Tracking"] || ''}</div>
-            <div><strong>Tracking CR:</strong> ${item["Tracking CR"] || ''}</div>
-            <div><strong>Type:</strong> <span class="${item["Type"] === "CR" ? 'bg-red-500' : 'bg-green-500'} text-white px-2 py-1 rounded">${item["Type"] || ''}</span></div>
-            <div><strong>Description:</strong> ${item["Description"] || ''}</div>
-            <div><strong>Date received:</strong> ${item["Date received"] || ''}</div>
-            <div><strong>Aging backlog:</strong> <span class="px-2 py-1 rounded font-semibold" style="background:${agingColor};color:white;">${aging} ngày</span></div>
-            <div><strong>Brief case:</strong> ${item["Brief case"] || ''}</div>
-            <div><strong>Created date:</strong> ${formatDateDDMMYYYYToInput(item["Created date"])}</div>
-            <div><strong>Final date:</strong> ${formatDateDDMMYYYYToInput(item["Final date"])}</div>
-            <div><strong>Last feedback date:</strong> ${formatDateDDMMYYYYToInput(item["Last feedback date"])}</div>
-            <div><strong>Last checked date:</strong> ${formatDateDDMMYYYYToInput(item["Last checked date"])}</div>
-          </div>
-        </body>
-        </html>
-      `);
-    }
+  if (!win) return alert('Không thể mở tab mới');
+
+  const doc = win.document;
+  const html = doc.documentElement;
+  doc.open();
+
+  const container = doc.createElement('html');
+  container.innerHTML = `
+    <head>
+      <title>Thông tin chi tiết</title>
+      <script src="https://cdn.tailwindcss.com"></script>
+    </head>
+    <body class="bg-gray-100 text-gray-800 p-6">
+      <div class="max-w-xl mx-auto bg-white rounded shadow p-4">
+        <h1 class="text-xl font-bold mb-2">Thông tin: ${item["Tên"]}</h1>
+        <p><strong>Trạng thái:</strong> ${item["TrạngThái"]}</p>
+        <p><strong>Loại:</strong> ${item["Loại"]}</p>
+        <!-- Thêm các field khác ở đây -->
+      </div>
+    </body>
+  `;
+
+  doc.write(container.outerHTML);
+  doc.close();
+}
 
     function calculateAging(dateStr) {
       const parts = dateStr.split('-');
@@ -132,3 +126,4 @@
   </script>
 </body>
 </html>
+
