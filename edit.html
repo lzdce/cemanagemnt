@@ -135,13 +135,13 @@
         </div>
 
         <div>
-          <label class="block">Last feedback date</label>
-          <input type="date" id="lastFeedbackDate" class="w-full border rounded p-2" />
+          <label class="block">Last feedback </label>
+          <input type="date" id="lastFeedback" class="w-full border rounded p-2" />
         </div>
 
         <div>
-          <label class="block">Last checked date</label>
-          <input type="date" id="lastCheckedDate" class="w-full border rounded p-2" />
+          <label class="block">Last checked</label>
+          <input type="date" id="lastChecked" class="w-full border rounded p-2" />
         </div>
 
       </div>
@@ -214,12 +214,12 @@
     set('ceStatus',         item['CE Status']);
     set('reasonDispute',    item['Reason dispute']);
     set('feedbackCount',    item['Feedback count']);
-    set('lastFeedbackDate', toInputDate(item['Last feedback date']));
-    set('lastCheckedDate',  toInputDate(item['Last checked date']));
+    set('lastFeedback', toInputDate(item['Last feedback']));
+    set('lastChecked',  toInputDate(item['Last checked']));
 
     // Lưu orig
     ['Created date','Final date','CE Status',
-     'Reason dispute','Feedback count','Last checked date'
+     'Reason dispute','Feedback count','Last checked'
     ].forEach(k => orig[k] = item[k] || '');
 
     /***** Checked no feedback *****/
@@ -230,7 +230,7 @@
     'CE Status':         document.getElementById('ceStatus').value,
     'Reason dispute':    document.getElementById('reasonDispute').value,
     'Feedback count':    document.getElementById('feedbackCount').value,
-    'Last checked date': document.getElementById('lastCheckedDate').value
+    'Last checked date': document.getElementById('lastChecked').value
   };
 
   const isChanged = Object.keys(curr).some(k => toDisplayDate(curr[k]) !== orig[k]);
@@ -264,8 +264,8 @@
   payload['CE Status']          = document.getElementById('ceStatus').value;
   payload['Reason dispute']     = document.getElementById('reasonDispute').value;
   payload['Feedback count']     = document.getElementById('feedbackCount').value;
-  payload['Last feedback date'] = toDisplayDate(document.getElementById('lastFeedbackDate').value);
-  payload['Last checked date']  = toDisplayDate(document.getElementById('lastCheckedDate').value);
+  payload['Last feedback'] = toDisplayDate(document.getElementById('lastFeedback').value);
+  payload['Last checked']  = toDisplayDate(document.getElementById('lastChecked').value);
 
   await pushToSheet(payload);
   window.opener.postMessage(payload, '*');
@@ -290,4 +290,5 @@
   </script>
 </body>
 </html>
+
 
