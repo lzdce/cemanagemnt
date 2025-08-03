@@ -74,7 +74,7 @@
     });
 
     function openNewTabWithDetails(item) {
-      const win = window.open('', '_blank');
+  const win = window.open('', '_blank');
   if (!win) return alert('Không thể mở tab mới');
 
   const escapeHTML = str =>
@@ -84,6 +84,21 @@
       .replace(/>/g, "&gt;")
       .replace(/"/g, "&quot;")
       .replace(/'/g, "&#039;");
+
+  const parseDateDDMMYYYY = dateStr => {
+    const [day, month, year] = dateStr.split('/');
+    return new Date(`${year}-${month}-${day}`);
+  };
+
+  const formatDateDDMMYYYYToInput = dateStr => {
+    const [day, month, year] = dateStr.split('/');
+    return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+  };
+
+  const today = new Date();
+  const receivedDate = parseDateDDMMYYYY(item["Date received"]);
+  const aging = Math.floor((today - receivedDate) / (1000 * 60 * 60 * 24));
+  const agingColor = aging >= 10 ? '#DC2626' : aging >= 5 ? '#FACC15' : '#16A34A';
 
   const fieldsHTML = Object.entries(item).map(([key, value]) =>
     `<p><strong>${escapeHTML(key)}:</strong> ${escapeHTML(value || '-')}</p>`
@@ -121,13 +136,12 @@
     </html>
   `;
 
-
   win.document.write(fullHTML);
   win.document.close();
-
-    }
+}
   </script>
 </body>
 </html>
+
 
 
