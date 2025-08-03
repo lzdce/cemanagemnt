@@ -1,88 +1,325 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8">
-  <title>Chỉnh sửa Case</title>
-  <style>
-    body { background: #f3f4f6; padding: 1.5rem; font-size: .875rem; color: #374151; font-family: sans-serif }
-    h2 { font-size: 1.25rem; font-weight: 600; margin-bottom: 1rem }
-    .grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 1rem; margin-bottom: 1.5rem }
-    input, textarea, select { width: 100%; padding: .5rem; border: 1px solid #ccc; border-radius: .375rem }
-    button { padding: .5rem 1rem; background: #2563eb; color: #fff; border: none; border-radius: .375rem; cursor: pointer }
-  </style>
+  <meta charset="UTF-8" />
+  <title>CE edit form</title>
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-  <h2>📦 Chỉnh sửa thông tin Case</h2>
-  <form id="editForm" class="grid">
-    <div><strong>Owner:</strong><input name="Owner name"></div>
-    <div><strong>ID:</strong><input name="ID"></div>
-    <div><strong>Tracking:</strong><input name="Tracking"></div>
-    <div><strong>Tracking CR:</strong><input name="Tracking CR"></div>
-    <div><strong>Type:</strong>
-      <select name="Type">
-        <option value="CR">CR</option>
-        <option value="FD">FD</option>
-        <option value="Other">Other</option>
-      </select>
+<body class="bg-gray-100">
+  <div class="min-h-screen flex items-center justify-center p-4">
+    <div class="w-full max-w-3xl bg-white rounded-lg shadow-lg overflow-hidden">
+      
+      <!-- HEADER: TITLE + ACTION BUTTONS -->
+      <div class="flex items-center justify-between bg-blue-600 p-4">
+        <h1 class="text-xl font-semibold text-white">CE edit form</h1>
+        <div class="space-x-2">
+          <button id="noFeedbackBtn" 
+                  class="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded">
+            Checked no feedback
+          </button>
+          <button id="saveBtn" 
+                  class="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded">
+            Change
+          </button>
+        </div>
+      </div>
+      
+      <div class="p-6 space-y-6">
+
+        <!-- SECTION 1: INFORMATION -->
+        <div class="border rounded p-4 bg-gray-50">
+          <h2 class="text-lg font-semibold mb-4">Information</h2>
+          <div class="grid grid-cols-2 gap-4">
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Owner name</label>
+              <input type="text" id="ownerName" 
+                     class="mt-1 w-full bg-gray-200 cursor-not-allowed border-gray-300 rounded p-2" 
+                     readonly>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700">ID</label>
+              <input type="text" id="idField" 
+                     class="mt-1 w-full bg-gray-200 cursor-not-allowed border-gray-300 rounded p-2" 
+                     readonly>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Tracking</label>
+              <input type="text" id="tracking" 
+                     class="mt-1 w-full bg-gray-200 cursor-not-allowed border-gray-300 rounded p-2" 
+                     readonly>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Tracking CR</label>
+              <input type="text" id="trackingCR" 
+                     class="mt-1 w-full bg-gray-200 cursor-not-allowed border-gray-300 rounded p-2" 
+                     readonly>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Type</label>
+              <span id="type" 
+                    class="mt-1 inline-block w-full bg-gray-200 cursor-not-allowed border border-gray-300 rounded p-2">
+              </span>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Description</label>
+              <textarea id="description" rows="2" 
+                        class="mt-1 w-full bg-gray-200 cursor-not-allowed border-gray-300 rounded p-2" 
+                        readonly></textarea>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Video OB</label>
+              <div id="videoOBContainer" 
+                   class="mt-1 w-full bg-gray-200 border border-gray-300 rounded p-2">
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Date received</label>
+              <input type="date" id="dateReceived" 
+                     class="mt-1 w-full bg-gray-200 cursor-not-allowed border-gray-300 rounded p-2" 
+                     readonly>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Aging backlog</label>
+              <span id="aging" 
+                    class="mt-1 inline-block w-full bg-gray-200 cursor-not-allowed border border-gray-300 rounded p-2">
+              </span>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- SECTION 2: STATUS -->
+        <div class="border rounded p-4 bg-white">
+          <h2 class="text-lg font-semibold mb-4">Status</h2>
+          <div class="grid grid-cols-2 gap-4">
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Brief case</label>
+              <input type="text" id="briefCase" 
+                     class="mt-1 w-full bg-gray-200 cursor-not-allowed border-gray-300 rounded p-2" 
+                     readonly>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Created date</label>
+              <input type="date" id="createdDate" 
+                     class="mt-1 w-full border-gray-300 rounded p-2">
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Final date</label>
+              <input type="date" id="finalDate" 
+                     class="mt-1 w-full border-gray-300 rounded p-2">
+            </div>
+
+            <div class="col-span-2">
+              <label class="block text-sm font-medium text-gray-700">CE Status</label>
+              <select id="ceStatus" 
+                      class="mt-1 w-full border-gray-300 rounded p-2">
+                <option value="">– Chọn trạng thái –</option>
+                <option>Created</option>
+                <option>Being process</option>
+                <option>Appeal success</option>
+                <option>Appeal reject</option>
+                <option>Do not claim</option>
+                <option>Need to follow</option>
+                <option>Closed</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Reason dispute</label>
+              <textarea id="reasonDispute" rows="2" 
+                        class="mt-1 w-full border-gray-300 rounded p-2"></textarea>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Feedback count</label>
+              <input type="number" id="feedbackCount" min="0" 
+                     class="mt-1 w-full border-gray-300 rounded p-2">
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Last feedback date</label>
+              <input type="date" id="lastFeedbackDate" 
+                     class="mt-1 w-full border-gray-300 rounded p-2">
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Last checked date</label>
+              <input type="date" id="lastCheckedDate" 
+                     class="mt-1 w-full border-gray-300 rounded p-2">
+            </div>
+
+          </div>
+        </div>
+
+      </div>
     </div>
-    <div><strong>Description:</strong><textarea name="Description"></textarea></div>
-    <div><strong>Date received:</strong><input name="Date received" type="date"></div>
-    <div><strong>Aging backlog:</strong>
-      <span id="agingBadge" style="color:#fff;padding:.25rem .5rem;border-radius:.375rem;font-weight:600"></span>
-    </div>
-    <div><strong>Brief case:</strong><input name="Brief case"></div>
-    <div><strong>Created date:</strong><input name="Created date" type="date"></div>
-    <div><strong>Final date:</strong><input name="Final date" type="date"></div>
-    <div><strong>Last feedback date:</strong><input name="Last feedback date" type="date"></div>
-    <div><strong>Last checked date:</strong><input name="Last checked date" type="date"></div>
-    <div style="grid-column: span 2"><button type="submit">💾 Lưu dữ liệu</button></div>
-  </form>
+  </div>
 
   <script>
-    // 1. Lấy item từ sessionStorage
+    // helper: format DD/MM/YYYY ➔ YYYY-MM-DD
+    function toInputDate(str) {
+      if (!str) return '';
+      if (str.includes('/')) {
+        const [d, m, y] = str.split('/');
+        return `${y}-${m.padStart(2,'0')}-${d.padStart(2,'0')}`;
+      }
+      return str;
+    }
+
+    // load item
     const raw = sessionStorage.getItem('editItem');
     const item = raw ? JSON.parse(raw) : {};
 
-    // 2. Helpers
-    const escapeHTML = s => String(s || '');
-    const formatToInput = str => {
-      if (!str || !str.includes('/')) return '';
-      const [d, m, y] = str.split('/');
-      return `${y}-${m.padStart(2,'0')}-${d.padStart(2,'0')}`;
+    // SECTION 1: populate and style
+    document.getElementById('ownerName').value      = item['Owner name'] || '';
+    document.getElementById('idField').value        = item['ID'] || '';
+    document.getElementById('tracking').value       = item['Tracking'] || '';
+    document.getElementById('trackingCR').value     = item['Tracking CR'] || '';
+    document.getElementById('description').value    = item['Description'] || '';
+
+    // Type color
+    const tEl = document.getElementById('type');
+    if (item.Type === 'CR') {
+      tEl.textContent = 'CR';
+      tEl.classList.add('text-red-600');
+    } else if (item.Type === 'FD') {
+      tEl.textContent = 'FD';
+      tEl.classList.add('text-green-600');
+    } else {
+      tEl.textContent = item.Type || '';
+    }
+
+    // Video OB
+    const vBox = document.getElementById('videoOBContainer');
+    if (item['Video OB']) {
+      const btn = document.createElement('button');
+      btn.textContent = 'Copy link';
+      btn.className = 'text-blue-600 underline';
+      btn.addEventListener('click', () => {
+        navigator.clipboard.writeText(item['Video OB']);
+      });
+      vBox.appendChild(btn);
+    } else {
+      vBox.textContent = 'Chưa update';
+    }
+
+    // Date received & aging
+    const dr = toInputDate(item['Date received']);
+    document.getElementById('dateReceived').value = dr;
+    const recv = new Date(dr);
+    const days = isNaN(recv)
+      ? 0
+      : Math.floor((new Date() - recv) / (1000*60*60*24));
+    document.getElementById('aging').textContent = `${days} ngày`;
+
+    // SECTION 2: initial vs current
+    const orig = {
+      'Brief case': item['Brief case'] || '',
+      'Created date': toInputDate(item['Created date']),
+      'Final date': toInputDate(item['Final date']),
+      'CE Status': item['CE Status'] || '',
+      'Reason dispute': item['Reason dispute'] || '',
+      'Feedback count': item['Feedback count'] || '',
+      'Last feedback date': toInputDate(item['Last feedback date']),
+      'Last checked date': toInputDate(item['Last checked date'])
     };
 
-    // 3. Điền form
-    document.querySelector('[name="Owner name"]').value        = escapeHTML(item["Owner name"]);
-    document.querySelector('[name="ID"]').value                = escapeHTML(item[2]);
-    document.querySelector('[name="Tracking"]').value          = escapeHTML(item[3]);
-    document.querySelector('[name="Tracking CR"]').value       = escapeHTML(item[4]);
-    document.querySelector('[name="Type"]').value              = item[5] || '';
-    document.querySelector('[name="Description"]').value       = escapeHTML(item[6]);
-    document.querySelector('[name="Date received"]').value     = formatToInput(item["Date received"]);
-    document.querySelector('[name="Brief case"]').value        = escapeHTML(item["Brief case"]);
-    document.querySelector('[name="Created date"]').value      = formatToInput(item["Created date"]);
-    document.querySelector('[name="Final date"]').value        = formatToInput(item["Final date"]);
-    document.querySelector('[name="Last feedback date"]').value = formatToInput(item["Last feedback date"]);
-    document.querySelector('[name="Last checked date"]').value  = formatToInput(item["Last checked date"]);
+    // fill Section 2
+    document.getElementById('briefCase').value      = orig['Brief case'];
+    document.getElementById('createdDate').value    = orig['Created date'];
+    document.getElementById('finalDate').value      = orig['Final date'];
+    const ceSel = document.getElementById('ceStatus');
+    ceSel.value = orig['CE Status'];
+    document.getElementById('reasonDispute').value = orig['Reason dispute'];
+    document.getElementById('feedbackCount').value = orig['Feedback count'];
+    document.getElementById('lastFeedbackDate').value = orig['Last feedback date'];
+    document.getElementById('lastCheckedDate').value  = orig['Last checked date'];
 
-    // 4. Tính và hiển thị badge aging
-    const recv = new Date(document.querySelector('[name="Date received"]').value);
-    const days = isNaN(recv) ? 0 : Math.floor((new Date() - recv) / (1000*60*60*24));
-    const color = days >= 10 ? '#DC2626'
-                : days >= 5  ? '#FACC15'
-                : '#16A34A';
-    const badge = document.getElementById('agingBadge');
-    badge.textContent = days + ' ngày';
-    badge.style.background = color;
+    // color CE Status
+    function updateStatusColor() {
+      ceSel.classList.remove(
+        'bg-blue-200','bg-yellow-200','bg-green-200',
+        'bg-red-200','bg-gray-200','bg-purple-200',
+        'bg-black','text-white'
+      );
+      const v = ceSel.value;
+      if (v === 'Created')          ceSel.classList.add('bg-blue-200');
+      else if (v === 'Being process') ceSel.classList.add('bg-yellow-200');
+      else if (v === 'Appeal success') ceSel.classList.add('bg-green-200');
+      else if (v === 'Appeal reject')  ceSel.classList.add('bg-red-200');
+      else if (v === 'Do not claim')   ceSel.classList.add('bg-gray-200');
+      else if (v === 'Need to follow') ceSel.classList.add('bg-purple-200');
+      else if (v === 'Closed')         ceSel.classList.add('bg-black','text-white');
+    }
+    ceSel.addEventListener('change', updateStatusColor);
+    updateStatusColor();
 
-    // 5. Submit và trả về index.html
-    document.getElementById('editForm').addEventListener('submit', e => {
-      e.preventDefault();
-      const fm = new FormData(e.target);
-      const updated = { _row: item._row || null };
-      for (const [k, v] of fm.entries()) {
-        updated[k] = v;
+    // NO FEEDBACK BUTTON
+    document.getElementById('noFeedbackBtn').addEventListener('click', () => {
+      const curr = {
+        'Created date': document.getElementById('createdDate').value,
+        'Final date': document.getElementById('finalDate').value,
+        'CE Status': ceSel.value,
+        'Reason dispute': document.getElementById('reasonDispute').value,
+        'Feedback count': document.getElementById('feedbackCount').value,
+        'Last checked date': document.getElementById('lastCheckedDate').value
+      };
+      let changed = false;
+      for (let k in curr) {
+        if (curr[k] !== orig[k]) { changed = true; break; }
       }
+      function onlyUpdateLastFB() {
+        const today = new Date().toISOString().slice(0,10);
+        window.opener.postMessage(
+          { _row: item._row, 'Last feedback date': today },
+          '*'
+        );
+        sessionStorage.removeItem('editItem');
+        window.close();
+      }
+      if (changed) {
+        if (confirm('Bạn đã change data, hãy confirm nếu bạn đồng ý chỉ change Last feedback date')) {
+          onlyUpdateLastFB();
+        }
+      } else {
+        onlyUpdateLastFB();
+      }
+    });
+
+    // SAVE / CHANGE BUTTON
+    document.getElementById('saveBtn').addEventListener('click', () => {
+      const updated = { _row: item._row };
+      const fields = [
+        'Brief case','Created date','Final date',
+        'CE Status','Reason dispute','Feedback count',
+        'Last feedback date','Last checked date'
+      ];
+      fields.forEach(key => {
+        let val = '';
+        switch (key) {
+          case 'Brief case':      val = document.getElementById('briefCase').value; break;
+          case 'Created date':    val = document.getElementById('createdDate').value; break;
+          case 'Final date':      val = document.getElementById('finalDate').value; break;
+          case 'CE Status':       val = ceSel.value; break;
+          case 'Reason dispute':  val = document.getElementById('reasonDispute').value; break;
+          case 'Feedback count':  val = document.getElementById('feedbackCount').value; break;
+          case 'Last feedback date': val = document.getElementById('lastFeedbackDate').value; break;
+          case 'Last checked date':  val = document.getElementById('lastCheckedDate').value; break;
+        }
+        updated[key] = val;
+      });
       window.opener.postMessage(updated, '*');
       sessionStorage.removeItem('editItem');
       window.close();
@@ -90,6 +327,3 @@
   </script>
 </body>
 </html>
-
-
-
