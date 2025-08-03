@@ -14,12 +14,9 @@
     <tbody id="tbody"></tbody>
   </table>
 
-  <div id="accordionContainer" class="max-w-screen-xl mx-auto space-y-4 hidden"></div>
-
   <script>
     const url = 'https://lzdcemanagement.phuonghoangcao1703.workers.dev/';
     let originalData = [];
-    let currentItem = {};
 
     fetch(url)
       .then(r => r.json())
@@ -41,13 +38,13 @@
       header.innerHTML = `<th class="px-4 py-2">✏️</th>` + keys.map(k => `<th class="px-4 py-2">${k}</th>`).join('');
       thead.appendChild(header);
 
-      data.forEach((item) => {
+      data.forEach(item => {
         const tr = document.createElement("tr");
 
         const btnTd = document.createElement("td");
         const btn = document.createElement("button");
-        btn.className = "text-blue-600 hover:underline";
         btn.textContent = "✏️";
+        btn.className = "text-blue-600 hover:underline";
         btn.onclick = () => openNewTabWithDetails(item);
         btnTd.appendChild(btn);
         tr.appendChild(btnTd);
@@ -63,12 +60,20 @@
       });
     }
 
+    function formatDateDDMMYYYYToInput(dateStr) {
+      if (!dateStr || !dateStr.includes('-')) return '';
+      const parts = dateStr.split('-');
+      if (parts.length !== 3) return '';
+      const [dd, mm, yyyy] = parts;
+      return `${yyyy}-${mm.padStart(2,'0')}-${dd.padStart(2,'0')}`;
+    }
+
     function openNewTabWithDetails(item) {
       const aging = calculateAging(item["Date received"]);
       const agingColor = getColor(aging);
-      const detailWindow = window.open('', '_blank');
 
-      detailWindow.document.write(`
+      const win = window.open('', '_blank');
+      win.document.write(`
         <!DOCTYPE html>
         <html lang="vi">
         <head>
@@ -88,9 +93,10 @@
             <div><strong>Date received:</strong> ${item["Date received"] || ''}</div>
             <div><strong>Aging backlog:</strong> <span class="px-2 py-1 rounded font-semibold" style="background:${agingColor};color:white;">${aging} ngày</span></div>
             <div><strong>Brief case:</strong> ${item["Brief case"] || ''}</div>
-          </div>
-          <div class="mt-4">
-            <button onclick="window.close()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Đóng tab</button>
+            <div><strong>Created date:</strong> ${formatDateDDMMYYYYToInput(item["Created date"])}</div>
+            <div><strong>Final date:</strong> ${formatDateDDMMYYYYToInput(item["Final date"])}</div>
+            <div><strong>Last feedback date:</strong> ${formatDateDDMMYYYYToInput(item["Last feedback date"])}</div>
+            <div><strong>Last checked date:</strong> ${formatDateDDMMYYYYToInput(item["Last checked date"])}</div>
           </div>
         </body>
         </html>
@@ -98,20 +104,23 @@
     }
 
     function calculateAging(dateStr) {
-      const received = new Date(dateStr);
+      const parts = dateStr.split('-');
+      if (parts.length !== 3) return '-';
+      const [dd, mm, yyyy] = parts;
+      const received = new Date(`${yyyy}-${mm}-${dd}`);
       const today = new Date();
-      const diff = Math.floor((today - received)/(1000*60*60*24));
+      const diff = Math.floor((today - received) / (1000 * 60 * 60 * 24));
       return isFinite(diff) && diff >= 0 ? diff : '-';
     }
 
     function getColor(days) {
-      if(days === '-') return '#6c757d';
-      if(days <= 3) return '#22c55e';
-      if(days <= 7) return '#eab308';
+      if (days === '-') return '#6c757d';
+      if (days <= 3) return '#22c55e';
+      if (days <= 7) return '#eab308';
       return '#ef4444';
     }
 
-    document.getElementById("searchInput").addEventListener("input", function() {
+    document.getElementById("searchInput").addEventListener("input", function () {
       const keyword = this.value.toLowerCase();
       const filtered = originalData.filter(item =>
         Object.values(item).some(val =>
