@@ -29,39 +29,46 @@
         renderTable(originalData);
       });
 
-    function renderTable(data) {
-      const thead = document.getElementById("thead");
-      const tbody = document.getElementById("tbody");
-      thead.innerHTML = '';
-      tbody.innerHTML = '';
+   function renderTable(data) {
+  const thead = document.getElementById("thead");
+  const tbody = document.getElementById("tbody");
+  thead.innerHTML = '';
+  tbody.innerHTML = '';
 
-      if (!data.length) return;
+  if (!data.length) return;
 
-      const keys = Object.keys(data[0]);
-      const header = document.createElement("tr");
-      header.innerHTML = `<th class="px-4 py-2">✏️</th>` + keys.map(k => `<th class="px-4 py-2">${k}</th>`).join('');
-      thead.appendChild(header);
+  const keys = Object.keys(data[0]);
+  const header = document.createElement("tr");
+  header.innerHTML = `<th class="px-4 py-2">✏️</th>` + keys.map(k => `<th class="px-4 py-2">${k}</th>`).join('');
+  thead.appendChild(header);
 
-      data.forEach(item => {
-        const tr = document.createElement("tr");
-        const btnTd = document.createElement("td");
-        btnTd.innerHTML = `<button class="text-blue-600 hover:underline" onclick='showDetails(${JSON.stringify(JSON.stringify(item) )})'>✏️</button>`;
-        tr.appendChild(btnTd);
-        keys.forEach(k => {
-          const td = document.createElement("td");
-          td.className = "px-4 py-2 border-t";
-          td.textContent = item[k];
-          tr.appendChild(td);
-        });
-        tbody.appendChild(tr);
-      });
-    }
+  data.forEach((item, index) => {
+    const tr = document.createElement("tr");
+
+    const btnTd = document.createElement("td");
+    const btn = document.createElement("button");
+    btn.className = "text-blue-600 hover:underline";
+    btn.textContent = "✏️";
+    btn.onclick = () => showDetails(item);
+    btnTd.appendChild(btn);
+    tr.appendChild(btnTd);
+
+    keys.forEach(k => {
+      const td = document.createElement("td");
+      td.className = "px-4 py-2 border-t";
+      td.textContent = item[k];
+      tr.appendChild(td);
+    });
+
+    tbody.appendChild(tr);
+  });
+}
 
     function showDetails(encodedItem) {
-      const item = JSON.parse(JSON.parse(encodedItem));
       currentItem = item;
-      const aging = calculateAging(item["Date received"]);
-      const agingColor = getColor(aging);
+  const aging = calculateAging(item["Date received"]);
+  const agingColor = getColor(aging);
+
 
       const accordion = `
         <details open class="bg-white rounded shadow p-4">
@@ -154,3 +161,4 @@
   </script>
 </body>
 </html>
+
