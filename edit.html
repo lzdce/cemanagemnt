@@ -183,7 +183,7 @@
     const item = raw ? JSON.parse(raw) : {};
 
     // SECTION 1: populate and style
-    document.getElementById('ownerName').value      =  '';
+    document.getElementById('ownerName').value      = item['Owner name'] || '';
     document.getElementById('idField').value        = item['ID'] || '';
     document.getElementById('tracking').value       = item['Tracking'] || '';
     document.getElementById('trackingCR').value     = item['Tracking CR'] || '';
@@ -216,7 +216,7 @@
     }
 
    // Dữ liệu ban đầu kiểu dd/mm/yyyy
-    document.getElementById('dateReceived').value    = item['ID'] || '';
+    document.getElementById('dateReceived').value    = item['Date received'] || '';
 
 
 // Tách ngày để tính aging
@@ -333,6 +333,7 @@ document.getElementById('aging').textContent = `${days} ngày`;
   </script>
 </body>
 </html>
+
 
 
 
