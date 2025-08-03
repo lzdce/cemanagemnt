@@ -75,53 +75,42 @@
 
     function openNewTabWithDetails(item) {
       const win = window.open('', '_blank');
-      if (!win) return alert('Không thể mở tab mới');
+  if (!win) return alert('Không thể mở tab mới');
 
-      const doc = win.document;
-      doc.open();
+  const escapeHTML = str =>
+    String(str)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
 
-      const html = doc.createElement('html');
-      html.setAttribute('lang', 'vi');
+  const fieldsHTML = Object.entries(item).map(([key, value]) =>
+    `<p><strong>${escapeHTML(key)}:</strong> ${escapeHTML(value || '-')}</p>`
+  ).join('');
 
-      const head = doc.createElement('head');
-      const meta = doc.createElement('meta');
-      meta.setAttribute('charset', 'UTF-8');
-      head.appendChild(meta);
+  const fullHTML = `
+    <!DOCTYPE html>
+    <html lang="vi">
+      <head>
+        <meta charset="UTF-8" />
+        <title>Thông tin chi tiết</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+      </head>
+      <body class="bg-gray-100 text-gray-800 p-6">
+        <div class="max-w-xl mx-auto bg-white rounded shadow p-4">
+          <h1 class="text-xl font-bold mb-4">Thông tin: ${escapeHTML(item["Tên"])}</h1>
+          ${fieldsHTML}
+        </div>
+      </body>
+    </html>
+  `;
 
-      const title = doc.createElement('title');
-      title.textContent = 'Thông tin chi tiết';
-      head.appendChild(title);
+  win.document.write(fullHTML);
+  win.document.close();
 
-      const script = doc.createElement('script');
-      script.src = 'https://cdn.tailwindcss.com';
-      head.appendChild(script);
-
-      html.appendChild(head);
-
-      const body = doc.createElement('body');
-      body.className = 'bg-gray-100 text-gray-800 p-6';
-
-      const container = doc.createElement('div');
-      container.className = 'max-w-xl mx-auto bg-white rounded shadow p-4';
-
-      const heading = doc.createElement('h1');
-      heading.className = 'text-xl font-bold mb-4';
-      heading.textContent = `Thông tin: ${item["Tên"]}`;
-      container.appendChild(heading);
-
-      Object.entries(item).forEach(([key, value]) => {
-        const p = doc.createElement('p');
-        p.className = 'mb-2';
-        p.innerHTML = `<strong>${key}:</strong> ${value || '-'}`;
-        container.appendChild(p);
-      });
-
-      body.appendChild(container);
-      html.appendChild(body);
-
-      doc.write('<!DOCTYPE html>\n' + html.outerHTML);
-      doc.close();
     }
   </script>
 </body>
 </html>
+
