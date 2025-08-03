@@ -33,53 +33,66 @@
       });
 
     // 2. Hàm render table, gán class cho từng field và nút Edit
-    function renderTable(data) {
-      const thead = document.getElementById("thead");
-      const tbody = document.getElementById("tbody");
-      thead.innerHTML = '';
-      tbody.innerHTML = '';
-      if (!data.length) return;
+   function renderTable(data) {
+  const thead = document.getElementById("thead");
+  const tbody = document.getElementById("tbody");
+  thead.innerHTML = '';
+  tbody.innerHTML = '';
+  if (!data.length) return;
 
-      const keys = Object.keys(data[0]);
-      // Header
-      const headerRow = document.createElement("tr");
-      headerRow.innerHTML =
-        `<th class="px-4 py-2">✏️</th>` +
-        keys.map(k => `<th class="px-4 py-2 text-left">${k}</th>`).join('');
-      thead.appendChild(headerRow);
+  const keys = Object.keys(data[0]);
 
-      // Body
-      data.forEach((item, idx) => {
-        const tr = document.createElement("tr");
+  // Header
+  const headerRow = document.createElement("tr");
+  headerRow.innerHTML =
+    `<th class="px-4 py-2">✏️</th>` +
+    keys.map(k => `<th class="px-4 py-2 text-left">${k}</th>`).join('');
+  thead.appendChild(headerRow);
 
-        // Edit button
-        const tdBtn = document.createElement("td");
-        const btn = document.createElement("button");
-        btn.textContent = "✏️";
-        btn.className = "text-blue-600 hover:underline";
-        btn.onclick = () => {
-          // Đẩy cả _row để biết update dòng nào
-          sessionStorage.setItem(
-            'editItem',
-            JSON.stringify({ ...item, _row: idx })
-          );
-          window.open('edit.html', '_blank');
-        };
-        tdBtn.appendChild(btn);
-        tr.appendChild(tdBtn);
+  // Body
+  data.forEach((item, idx) => {
+    const tr = document.createElement("tr");
 
-        // Các cột dữ liệu
-        keys.forEach(k => {
-          const td = document.createElement("td");
-          const fieldClass = k.replace(/\s+/g, '');
-          td.className = `px-4 py-2 border-t ${fieldClass}`;
-          td.textContent = item[k] ?? '';
-          tr.appendChild(td);
-        });
+    // Edit button
+    const tdBtn = document.createElement("td");
+    const btn = document.createElement("button");
+    btn.textContent = "✏️";
+    btn.className = "text-blue-600 hover:underline";
+    btn.onclick = () => {
+      sessionStorage.setItem(
+        'editItem',
+        JSON.stringify({ ...item, _row: idx })
+      );
+      window.open('edit.html', '_blank');
+    };
+    tdBtn.appendChild(btn);
+    tr.appendChild(tdBtn);
 
-        tbody.appendChild(tr);
-      });
-    }
+    // Các cột dữ liệu
+    keys.forEach(k => {
+      const td = document.createElement("td");
+      const fieldClass = k.replace(/\s+/g, '');
+      td.className = `px-4 py-2 border-t ${fieldClass}`;
+
+      let val = item[k] ?? '';
+
+      // Format nếu là Date received
+      if (k === 'Date received' && typeof val === 'string' && val.includes('T')) {
+        const d = new Date(val);
+        const day = String(d.getDate()).padStart(2, '0');
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const year = d.getFullYear();
+        val = `${day}/${month}/${year}`;
+      }
+
+      td.textContent = val;
+      tr.appendChild(td);
+    });
+
+    tbody.appendChild(tr);
+  });
+}
+
 
     // 3. Tìm kiếm
     document.getElementById("searchInput").addEventListener("input", function () {
@@ -118,3 +131,4 @@
   </script>
 </body>
 </html>
+
