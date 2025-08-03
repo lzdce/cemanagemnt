@@ -21,10 +21,10 @@
   </table>
 
   <script>
-    const url = 'https://lzdcemanagement.phuonghoangcao1703.workers.dev/';
+    const DATA_URL = 'https://lzdcemanagement.phuonghoangcao1703.workers.dev/';
     let originalData = [];
 
-    fetch(url)
+    fetch(DATA_URL)
       .then(r => r.json())
       .then(data => {
         originalData = Array.isArray(data) ? data : [data];
@@ -48,14 +48,21 @@
       data.forEach(item => {
         const tr = document.createElement("tr");
 
-        const btnTd = document.createElement("td");
+        // Nút Edit
+        const tdBtn = document.createElement("td");
         const btn = document.createElement("button");
         btn.textContent = "✏️";
         btn.className = "text-blue-600 hover:underline";
-        btn.onclick = () => openNewTabWithDetails(item);
-        btnTd.appendChild(btn);
-        tr.appendChild(btnTd);
+        btn.onclick = () => {
+          // Lưu item vào sessionStorage
+          sessionStorage.setItem('editItem', JSON.stringify(item));
+          // Mở edit.html
+          window.open('edit.html', '_blank');
+        };
+        tdBtn.appendChild(btn);
+        tr.appendChild(tdBtn);
 
+        // Các cột dữ liệu
         keys.forEach(k => {
           const td = document.createElement("td");
           td.className = "px-4 py-2 border-t";
@@ -67,6 +74,7 @@
       });
     }
 
+    // Tính năng tìm kiếm
     document.getElementById("searchInput").addEventListener("input", function () {
       const keyword = this.value.toLowerCase();
       const filtered = originalData.filter(item =>
@@ -76,21 +84,6 @@
       );
       renderTable(filtered);
     });
-
-    // Hàm mở tab mới và truyền item qua query-string
-    function openNewTabWithDetails(item) {
-      const params = new URLSearchParams();
-      Object.entries(item).forEach(([key, val]) => {
-        if (val !== null && val !== undefined) {
-          params.append(key, val);
-        }
-      });
-
-      // Nếu edit.html nằm cùng folder với index.html
-      const editUrl = `${window.location.origin}${window.location.pathname.replace(/index\.html$/, '')}edit.html?${params.toString()}`;
-
-      window.open(editUrl, '_blank');
-    }
   </script>
 </body>
 </html>
