@@ -21,19 +21,16 @@
   </table>
 
   <script>
-    const readUrl = 'https://lzdcemanagement.phuonghoangcao1703.workers.dev/';
-    const writeUrl = 'https://script.google.com/macros/s/AKfycbz2C-aJW6Sr6B3awaeRi_LucMBcvVa4bcu3cK0Gja9pO80lvb5qmA71shGP99B3N46CCw/exec';
+    const url = 'https://lzdcemanagement.phuonghoangcao1703.workers.dev/';
     let originalData = [];
 
-    // load data from workers.dev
-    fetch(readUrl)
+    fetch(url)
       .then(r => r.json())
       .then(data => {
         originalData = Array.isArray(data) ? data : [data];
         renderTable(originalData);
       });
 
-    // render table body and header
     function renderTable(data) {
       const thead = document.getElementById("thead");
       const tbody = document.getElementById("tbody");
@@ -51,7 +48,6 @@
       data.forEach(item => {
         const tr = document.createElement("tr");
 
-        // pencil button
         const btnTd = document.createElement("td");
         const btn = document.createElement("button");
         btn.textContent = "✏️";
@@ -60,7 +56,6 @@
         btnTd.appendChild(btn);
         tr.appendChild(btnTd);
 
-        // data cells
         keys.forEach(k => {
           const td = document.createElement("td");
           td.className = "px-4 py-2 border-t";
@@ -72,7 +67,6 @@
       });
     }
 
-    // live search
     document.getElementById("searchInput").addEventListener("input", function () {
       const keyword = this.value.toLowerCase();
       const filtered = originalData.filter(item =>
@@ -83,33 +77,19 @@
       renderTable(filtered);
     });
 
-    // receive updated data from edit.html
-    window.addEventListener('message', async event => {
-      const updated = event.data;
-      if (!updated?._row) return;
-
-      // update sheet via Apps Script
-      await fetch(writeUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(updated)
+    // Hàm mở tab mới và truyền item qua query-string
+    function openNewTabWithDetails(item) {
+      const params = new URLSearchParams();
+      Object.entries(item).forEach(([key, val]) => {
+        if (val !== null && val !== undefined) {
+          params.append(key, val);
+        }
       });
 
-      // update local array and re-render
-      originalData = originalData.map(item =>
-        item._row === updated._row ? updated : item
-      );
-      renderTable(originalData);
-    });
+      // Nếu edit.html nằm cùng folder với index.html
+      const editUrl = `${window.location.origin}${window.location.pathname.replace(/index\.html$/, '')}edit.html?${params.toString()}`;
 
-    // open the edit.html in a new tab and pass data
-    function openNewTabWithDetails(item) {
-      if (!item._row) {
-        // if row info missing, assume 1-based index + header
-        item._row = item.rowIndex ?? originalData.indexOf(item) + 2;
-      }
-      window.sharedEditData = { ...item };
-      window.open('/edit.html', '_blank');
+      window.open(editUrl, '_blank');
     }
   </script>
 </body>
