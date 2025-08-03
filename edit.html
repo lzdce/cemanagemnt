@@ -216,7 +216,7 @@
     }
 
    // Dữ liệu ban đầu kiểu dd/mm/yyyy
-    document.getElementById('dateReceived').value    = item['Date received'] || '';
+    document.getElementById('dateReceived').value    = item[ID] || '';
 
 
 // Tách ngày để tính aging
@@ -333,6 +333,7 @@ document.getElementById('aging').textContent = `${days} ngày`;
   </script>
 </body>
 </html>
+
 
 
 
