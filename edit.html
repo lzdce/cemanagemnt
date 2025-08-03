@@ -216,13 +216,19 @@
     }
 
     // Date received & aging
-    const dr = toInputDate(item['Date received']);
-    document.getElementById('dateReceived').value = dr;
-    const recv = new Date(dr);
-    const days = isNaN(recv)
-      ? 0
-      : Math.floor((new Date() - recv) / (1000*60*60*24));
-    document.getElementById('aging').textContent = `${days} ngày`;
+const drRaw = item['Date received']; // dạng dd/mm/yyyy
+document.getElementById('dateReceived').value = drRaw;
+
+// Tách ngày, tháng, năm
+const [day, month, year] = drRaw.split('/').map(Number);
+const recv = new Date(year, month - 1, day); // tháng tính từ 0
+
+const days = isNaN(recv)
+  ? 0
+  : Math.floor((new Date() - recv) / (1000 * 60 * 60 * 24));
+
+document.getElementById('aging').textContent = `${days} ngày`;
+
 
     // SECTION 2: initial vs current
     const orig = {
@@ -327,3 +333,4 @@
   </script>
 </body>
 </html>
+
