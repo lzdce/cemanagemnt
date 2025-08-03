@@ -53,11 +53,11 @@
 
     // 3. Điền form
     document.querySelector('[name="Owner name"]').value        = escapeHTML(item[1]);
-    document.querySelector('[name="ID"]').value                = escapeHTML(item["ID"]);
-    document.querySelector('[name="Tracking"]').value          = escapeHTML(item["Tracking"]);
-    document.querySelector('[name="Tracking CR"]').value       = escapeHTML(item["Tracking CR"]);
-    document.querySelector('[name="Type"]').value              = item["Type"] || '';
-    document.querySelector('[name="Description"]').value       = escapeHTML(item["Description"]);
+    document.querySelector('[name="ID"]').value                = escapeHTML(item[2]);
+    document.querySelector('[name="Tracking"]').value          = escapeHTML(item[3]);
+    document.querySelector('[name="Tracking CR"]').value       = escapeHTML(item[4]);
+    document.querySelector('[name="Type"]').value              = item[5] || '';
+    document.querySelector('[name="Description"]').value       = escapeHTML(item[6]);
     document.querySelector('[name="Date received"]').value     = formatToInput(item["Date received"]);
     document.querySelector('[name="Brief case"]').value        = escapeHTML(item["Brief case"]);
     document.querySelector('[name="Created date"]').value      = formatToInput(item["Created date"]);
@@ -90,4 +90,5 @@
   </script>
 </body>
 </html>
+
 
