@@ -283,7 +283,7 @@
       function onlyUpdateLastFB() {
         const today = new Date().toISOString().slice(0,10);
         window.opener.postMessage(
-          { _row: item._row, 'Last feedback date': today },
+          { _row: item._row, 'Last feedback': today },
           '*'
         );
         sessionStorage.removeItem('editItem');
@@ -327,3 +327,4 @@
   </script>
 </body>
 </html>
+
