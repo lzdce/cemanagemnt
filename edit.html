@@ -224,55 +224,55 @@
 
     /***** Checked no feedback *****/
     document.getElementById('noFeedbackBtn').addEventListener('click', async () => {
-      const curr = {
-        'Created date':      document.getElementById('createdDate').value,
-        'Final date':        document.getElementById('finalDate').value,
-        'CE Status':         document.getElementById('ceStatus').value,
-        'Reason dispute':    document.getElementById('reasonDispute').value,
-        'Feedback count':    document.getElementById('feedbackCount').value,
-        'Last checked date': document.getElementById('lastCheckedDate').value
-      };
-      const isChanged = Object.keys(curr).some(k => toDisplayDate(curr[k]) !== orig[k]);
+  const curr = {
+    'Created date':      document.getElementById('createdDate').value,
+    'Final date':        document.getElementById('finalDate').value,
+    'CE Status':         document.getElementById('ceStatus').value,
+    'Reason dispute':    document.getElementById('reasonDispute').value,
+    'Feedback count':    document.getElementById('feedbackCount').value,
+    'Last checked date': document.getElementById('lastCheckedDate').value
+  };
 
-      if (isChanged) {
-        const ok = confirm('Bạn đã change data, bạn có muốn bỏ qua data đã change và chỉ cập nhật Last checked không?');
-        if (!ok) return;
-      }
+  const isChanged = Object.keys(curr).some(k => toDisplayDate(curr[k]) !== orig[k]);
+  const today = new Date().toISOString().slice(0,10);
+  const payload = { ...item };  // sao chép toàn bộ item gốc
 
-      const today = new Date().toISOString().slice(0,10);
-      await pushToSheet({ _row: item._row, 'Last checked date': today });
-      window.opener.postMessage({ _row: item._row, 'Last checked date': today }, '*');
-      sessionStorage.removeItem('editItem');
-      window.close();
-    });
+  payload['Last checked'] = today;
+
+  if (!isChanged) {
+    // Nếu không có gì thay đổi, ta sẽ gán thêm Date received = today
+    payload['Date received'] = today;
+  } else {
+    const ok = confirm('Bạn đã change data, bạn có muốn bỏ qua data đã change và chỉ cập nhật Last checked không?');
+    if (!ok) return;
+  }
+
+  await pushToSheet(payload);
+  window.opener.postMessage(payload, '*');
+  sessionStorage.removeItem('editItem');
+  window.close();
+});
+
 
     /***** SAVE *****/
     document.getElementById('saveBtn').addEventListener('click', async () => {
-      const payload = { _row: item._row };
+  const payload = { ...item };  // sao chép toàn bộ dữ liệu gốc
 
-      const collect = (key, id, transform = v => v) => {
-        const val = transform(document.getElementById(id).value);
-        if (val !== orig[key]) payload[key] = val;
-      };
+  // Cập nhật lại các field có thể chỉnh sửa
+  payload['Created date']       = toDisplayDate(document.getElementById('createdDate').value);
+  payload['Final date']         = toDisplayDate(document.getElementById('finalDate').value);
+  payload['CE Status']          = document.getElementById('ceStatus').value;
+  payload['Reason dispute']     = document.getElementById('reasonDispute').value;
+  payload['Feedback count']     = document.getElementById('feedbackCount').value;
+  payload['Last feedback date'] = toDisplayDate(document.getElementById('lastFeedbackDate').value);
+  payload['Last checked date']  = toDisplayDate(document.getElementById('lastCheckedDate').value);
 
-      collect('Created date',      'createdDate',      toDisplayDate);
-      collect('Final date',        'finalDate',        toDisplayDate);
-      collect('CE Status',         'ceStatus');
-      collect('Reason dispute',    'reasonDispute');
-      collect('Feedback count',    'feedbackCount');
-      collect('Last feedback date','lastFeedbackDate', toDisplayDate);
-      collect('Last checked date', 'lastCheckedDate',  toDisplayDate);
+  await pushToSheet(payload);
+  window.opener.postMessage(payload, '*');
+  sessionStorage.removeItem('editItem');
+  window.close();
+});
 
-      if (Object.keys(payload).length === 1) {
-        alert('Không có gì thay đổi!');
-        return;
-      }
-
-      await pushToSheet(payload);
-      window.opener.postMessage(payload, '*');
-      sessionStorage.removeItem('editItem');
-      window.close();
-    });
 
     /***** Gửi cập nhật đến Cloudflare Worker *****/
     async function pushToSheet(obj) {
@@ -290,3 +290,4 @@
   </script>
 </body>
 </html>
+
