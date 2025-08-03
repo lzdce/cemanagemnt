@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Chỉnh sửa Case</title>
+  <style>
+    body { background: #f3f4f6; padding: 1.5rem; font-size: .875rem; color: #374151; font-family: sans-serif }
+    h2 { font-size: 1.25rem; font-weight: 600; margin-bottom: 1rem }
+    .grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 1rem; margin-bottom: 1.5rem }
+    input, textarea, select { width: 100%; padding: .5rem; border: 1px solid #ccc; border-radius: .375rem }
+    button { padding: .5rem 1rem; background: #2563eb; color: #fff; border: none; border-radius: .375rem; cursor: pointer }
+  </style>
+</head>
+<body>
+  <h2>📦 Chỉnh sửa thông tin Case</h2>
+  <form id="editForm" class="grid">
+    <div><strong>Owner:</strong><input name="Owner name"></div>
+    <div><strong>ID:</strong><input name="ID"></div>
+    <div><strong>Tracking:</strong><input name="Tracking"></div>
+    <div><strong>Tracking CR:</strong><input name="Tracking CR"></div>
+    <div><strong>Type:</strong>
+      <select name="Type">
+        <option value="CR">CR</option>
+        <option value="FD">FD</option>
+        <option value="Other">Other</option>
+      </select>
+    </div>
+    <div><strong>Description:</strong><textarea name="Description"></textarea></div>
+    <div><strong>Date received:</strong><input name="Date received" type="date"></div>
+    <div><strong>Aging backlog:</strong>
+      <span id="agingBadge" style="color:#fff;padding:.25rem .5rem;border-radius:.375rem;font-weight:600"></span>
+    </div>
+    <div><strong>Brief case:</strong><input name="Brief case"></div>
+    <div><strong>Created date:</strong><input name="Created date" type="date"></div>
+    <div><strong>Final date:</strong><input name="Final date" type="date"></div>
+    <div><strong>Last feedback date:</strong><input name="Last feedback date" type="date"></div>
+    <div><strong>Last checked date:</strong><input name="Last checked date" type="date"></div>
+    <div style="grid-column: span 2"><button type="submit">💾 Lưu dữ liệu</button></div>
+  </form>
+
+  <script>
+    const item = window.opener.sharedEditData || {};
+    const escapeHTML = s => String(s||'');
+    const formatToInput = str => {
+      if(!str||!str.includes('/')) return '';
+      const [d,m,y]=str.split('/');
+      return `${y}-${m.padStart(2,'0')}-${d.padStart(2,'0')}`;
+    };
+
+    // Fill form
+    document.querySelector('[name="Owner name"]').value = escapeHTML(item["Owner name"]);
+    document.querySelector('[name="ID"]').value = escapeHTML(item["ID"]);
+    document.querySelector('[name="Tracking"]').value = escapeHTML(item["Tracking"]);
+    document.querySelector('[name="Tracking CR"]').value = escapeHTML(item["Tracking CR"]);
+    document.querySelector('[name="Type"]').value = item["Type"] || '';
+    document.querySelector('[name="Description"]').value = escapeHTML(item["Description"]);
+    document.querySelector('[name="Date received"]').value = formatToInput(item["Date received"]);
+    document.querySelector('[name="Brief case"]').value = escapeHTML(item["Brief case"]);
+    document.querySelector('[name="Created date"]').value = formatToInput(item["Created date"]);
+    document.querySelector('[name="Final date"]').value = formatToInput(item["Final date"]);
+    document.querySelector('[name="Last feedback date"]').value = formatToInput(item["Last feedback date"]);
+    document.querySelector('[name="Last checked date"]').value = formatToInput(item["Last checked date"]);
+
+    // Tính và hiển thị badge aging
+    const recv = new Date(formatToInput(item["Date received"]));
+    const days = Math.floor((new Date() - recv)/(1000*60*60*24));
+    const color = days>=10? '#DC2626' : days>=5? '#FACC15' : '#16A34A';
+    document.getElementById('agingBadge').textContent = days + ' ngày';
+    document.getElementById('agingBadge').style.background = color;
+
+    // Submit form
+    document.getElementById('editForm').addEventListener('submit', e => {
+      e.preventDefault();
+      const fm = new FormData(e.target);
+      const updated = { _row: item._row };
+      for(const [k,v] of fm.entries()) updated[k] = v;
+      window.opener.postMessage(updated, '*');
+      window.close();
+    });
+  </script>
+</body>
+</html>
+
