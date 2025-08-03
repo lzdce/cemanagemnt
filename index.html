@@ -96,77 +96,26 @@
   const today = new Date();
   const recv = parseDateDDMMYYYY(item["Date received"]);
   const aging = Math.floor((today - recv) / (1000 * 60 * 60 * 24));
-  const agingColor = aging >= 10 ? '#DC2626'
-                    : aging >= 5  ? '#FACC15'
-                                  : '#16A34A';
+  const agingColor = aging >= 10
+    ? '#DC2626'
+    : aging >= 5
+      ? '#FACC15'
+      : '#16A34A';
 
   if (!item._row) item._row = item.rowIndex ?? 2;
-  window.sharedEditData = { ...item };
+  window.sharedEditData = {
+    ...item,
+    aging,
+    agingColor,
+    formattedDateReceived: formatDateDDMMYYYYToInput(item["Date received"])
+  };
 
-  const fullHTML = `
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-  <meta charset="UTF-8">
-  <title>Chỉnh sửa Case</title>
-  <style>
-    body { background: #f3f4f6; padding: 1.5rem; font-size: .875rem; color: #374151; font-family: sans-serif }
-    h2 { font-size: 1.25rem; font-weight: 600; margin-bottom: 1rem }
-    .grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 1rem; margin-bottom: 1.5rem }
-    input, textarea, select { width: 100%; padding: .5rem; border: 1px solid #ccc; border-radius: .375rem }
-    button { padding: .5rem 1rem; background: #2563eb; color: #fff; border: none; border-radius: .375rem; cursor: pointer }
-  </style>
-</head>
-<body>
-  <h2>📦 Chỉnh sửa thông tin Case</h2>
-  <form id="editForm" class="grid">
-    <div><strong>Owner:</strong><input name="Owner name" value="${escapeHTML(item["Owner name"])}"></div>
-    <div><strong>ID:</strong><input name="ID" value="${escapeHTML(item["ID"])}"></div>
-    <div><strong>Tracking:</strong><input name="Tracking" value="${escapeHTML(item["Tracking"])}"></div>
-    <div><strong>Tracking CR:</strong><input name="Tracking CR" value="${escapeHTML(item["Tracking CR"])}"></div>
-    <div><strong>Type:</strong>
-      <select name="Type">
-        <option value="CR" ${item["Type"]==="CR"?"selected":""}>CR</option>
-        <option value="FD" ${item["Type"]==="FD"?"selected":""}>FD</option>
-        <option value="Other" ${!["CR","FD"].includes(item["Type"])?"selected":""}>Other</option>
-      </select>
-    </div>
-    <div><strong>Description:</strong><textarea name="Description">${escapeHTML(item["Description"])}</textarea></div>
-    <div><strong>Date received:</strong><input name="Date received" type="date" value="${formatDateDDMMYYYYToInput(item["Date received"])}"></div>
-    <div><strong>Aging backlog:</strong>
-      <span style="background:${agingColor};color:#fff;padding:.25rem .5rem;border-radius:.375rem;font-weight:600">
-        ${aging} ngày
-      </span>
-    </div>
-    <div><strong>Brief case:</strong><input name="Brief case" value="${escapeHTML(item["Brief case"])}"></div>
-    <div><strong>Created date:</strong><input name="Created date" type="date" value="${formatDateDDMMYYYYToInput(item["Created date"])}"></div>
-    <div><strong>Final date:</strong><input name="Final date" type="date" value="${formatDateDDMMYYYYToInput(item["Final date"])}"></div>
-    <div><strong>Last feedback date:</strong><input name="Last feedback date" type="date" value="${formatDateDDMMYYYYToInput(item["Last feedback date"])}"></div>
-    <div><strong>Last checked date:</strong><input name="Last checked date" type="date" value="${formatDateDDMMYYYYToInput(item["Last checked date"])}"></div>
-    <div style="grid-column: span 2"><button type="submit">💾 Lưu dữ liệu</button></div>
-  </form>
-
-  <script>
-    const item = window.opener.sharedEditData;
-    document.getElementById('editForm').addEventListener('submit', function(e) {
-      e.preventDefault();
-      const data = { _row: item._row };
-      const fm = new FormData(this);
-      for (const [k, v] of fm.entries()) data[k] = v;
-      window.opener.postMessage(data, '*');
-      window.close();
-    });
-  </script>
-</body>
-</html>
-`;
-
-  const dataUrl = 'data:text/html;charset=UTF-8,' + encodeURIComponent(fullHTML);
-  window.open(dataUrl, '_blank');
+  window.open('/edit.html', '_blank');
 }
   </script>
 </body>
 </html>
+
 
 
 
