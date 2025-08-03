@@ -14,7 +14,6 @@
     <tbody id="tbody"></tbody>
   </table>
 
-  <!-- Accordion details -->
   <div id="accordionContainer" class="max-w-screen-xl mx-auto space-y-4 hidden"></div>
 
   <script>
@@ -29,160 +28,87 @@
         renderTable(originalData);
       });
 
-   function renderTable(data) {
-  const thead = document.getElementById("thead");
-  const tbody = document.getElementById("tbody");
-  thead.innerHTML = '';
-  tbody.innerHTML = '';
+    function renderTable(data) {
+      const thead = document.getElementById("thead");
+      const tbody = document.getElementById("tbody");
+      thead.innerHTML = '';
+      tbody.innerHTML = '';
 
-  if (!data.length) return;
+      if (!data.length) return;
 
-  const keys = Object.keys(data[0]);
-  const header = document.createElement("tr");
-  header.innerHTML = `<th class="px-4 py-2">✏️</th>` + keys.map(k => `<th class="px-4 py-2">${k}</th>`).join('');
-  thead.appendChild(header);
+      const keys = Object.keys(data[0]);
+      const header = document.createElement("tr");
+      header.innerHTML = `<th class="px-4 py-2">✏️</th>` + keys.map(k => `<th class="px-4 py-2">${k}</th>`).join('');
+      thead.appendChild(header);
 
-  data.forEach((item, index) => {
-    const tr = document.createElement("tr");
+      data.forEach((item) => {
+        const tr = document.createElement("tr");
 
-    const btnTd = document.createElement("td");
-    const btn = document.createElement("button");
-    btn.className = "text-blue-600 hover:underline";
-    btn.textContent = "✏️";
-    btn.onclick = () => openNewTabWithDetails(item);
-    btnTd.appendChild(btn);
-    tr.appendChild(btnTd);
+        const btnTd = document.createElement("td");
+        const btn = document.createElement("button");
+        btn.className = "text-blue-600 hover:underline";
+        btn.textContent = "✏️";
+        btn.onclick = () => openNewTabWithDetails(item);
+        btnTd.appendChild(btn);
+        tr.appendChild(btnTd);
 
-    keys.forEach(k => {
-      const td = document.createElement("td");
-      td.className = "px-4 py-2 border-t";
-      td.textContent = item[k];
-      tr.appendChild(td);
-    });
+        keys.forEach(k => {
+          const td = document.createElement("td");
+          td.className = "px-4 py-2 border-t";
+          td.textContent = item[k];
+          tr.appendChild(td);
+        });
 
-    tbody.appendChild(tr);
-  });
-}
+        tbody.appendChild(tr);
+      });
+    }
 
     function openNewTabWithDetails(item) {
-  const detailWindow = window.open('', '_blank');
-  const aging = calculateAging(item["Date received"]);
-  const agingColor = getColor(aging);
+      const aging = calculateAging(item["Date received"]);
+      const agingColor = getColor(aging);
+      const detailWindow = window.open('', '_blank');
 
-  detailWindow.document.write(`
-    <!DOCTYPE html>
-    <html lang="vi">
-    <head>
-      <meta charset="UTF-8">
-      <title>Chi tiết Case</title>
-      <script src="https://cdn.tailwindcss.com"></script>
-    </head>
-    <body class="p-6 bg-gray-100 text-sm text-gray-800">
-      <h2 class="text-xl font-semibold mb-4">📦 Thông tin Chi tiết</h2>
-      <div class="grid grid-cols-2 gap-4 mb-6">
-        <div><strong>Owner:</strong> ${item["Owner name"] || ''}</div>
-        <div><strong>ID:</strong> ${item["ID"] || ''}</div>
-        <div><strong>Tracking:</strong> ${item["Tracking"] || ''}</div>
-        <div><strong>Tracking CR:</strong> ${item["Tracking CR"] || ''}</div>
-        <div><strong>Type:</strong> <span class="${item["Type"]==='CR' ? 'bg-red-500' : 'bg-green-500'} text-white px-2 py-1 rounded">${item["Type"] || ''}</span></div>
-        <div><strong>Description:</strong> ${item["Description"] || ''}</div>
-        <div><strong>Date received:</strong> ${item["Date received"] || ''}</div>
-        <div><strong>Aging backlog:</strong> <span class="px-2 py-1 rounded font-semibold" style="background:${agingColor};color:white;">${aging} ngày</span></div>
-        <div><strong>Brief case:</strong> ${item["Brief case"] || ''}</div>
-      </div>
-      <div class="mt-4">
-        <button onclick="window.close()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Đóng tab</button>
-      </div>
-    </body>
-    </html>
-  `);
-}
-    function showDetails(encodedItem) {
-      const item = JSON.parse(JSON.parse(encodedItem)); // ← decode đúng
-  currentItem = item;
-
-  const aging = calculateAging(item["Date received"]);
-  const agingColor = getColor(aging);
-
-
-
-      const accordion = `
-        <details open class="bg-white rounded shadow p-4">
-          <summary class="font-semibold text-lg cursor-pointer">📦 Thông tin Case</summary>
-          <div class="grid grid-cols-3 gap-4 mt-4 text-gray-700 text-sm">
+      detailWindow.document.write(`
+        <!DOCTYPE html>
+        <html lang="vi">
+        <head>
+          <meta charset="UTF-8">
+          <title>Chi tiết Case</title>
+          <script src="https://cdn.tailwindcss.com"></script>
+        </head>
+        <body class="p-6 bg-gray-100 text-sm text-gray-800">
+          <h2 class="text-xl font-semibold mb-4">📦 Thông tin Chi tiết</h2>
+          <div class="grid grid-cols-2 gap-4 mb-6">
             <div><strong>Owner:</strong> ${item["Owner name"] || ''}</div>
             <div><strong>ID:</strong> ${item["ID"] || ''}</div>
             <div><strong>Tracking:</strong> ${item["Tracking"] || ''}</div>
             <div><strong>Tracking CR:</strong> ${item["Tracking CR"] || ''}</div>
-            <div><strong>Type:</strong> <span class="${item["Type"]==='CR' ? 'bg-red-500' : 'bg-green-500'} text-white px-2 py-1 rounded">${item["Type"] || ''}</span></div>
+            <div><strong>Type:</strong> <span class="${item["Type"] === "CR" ? 'bg-red-500' : 'bg-green-500'} text-white px-2 py-1 rounded">${item["Type"] || ''}</span></div>
             <div><strong>Description:</strong> ${item["Description"] || ''}</div>
-            <div><strong>Video OB:</strong> ${item["Video OB"] ? `<button onclick="copyLink('${item["Video OB"]}')" class="text-blue-600 hover:underline">Copy link</button>` : 'Chưa update'}</div>
             <div><strong>Date received:</strong> ${item["Date received"] || ''}</div>
             <div><strong>Aging backlog:</strong> <span class="px-2 py-1 rounded font-semibold" style="background:${agingColor};color:white;">${aging} ngày</span></div>
             <div><strong>Brief case:</strong> ${item["Brief case"] || ''}</div>
           </div>
-        </details>
-
-        <details class="bg-white rounded shadow p-4">
-          <summary class="font-semibold text-lg cursor-pointer">🛠 Xử lý & Cập nhật</summary>
-          <div class="grid grid-cols-3 gap-4 mt-4 text-sm">
-            <input type="date" class="border p-2 rounded" value="${item["Created date"] || ''}" placeholder="Created date">
-            <input type="date" class="border p-2 rounded" value="${item["Final date"] || ''}" placeholder="Final date">
-            <input type="text" class="border p-2 rounded" value="${item["Reason dispute"] || ''}" placeholder="Reason dispute">
-            <select class="border p-2 rounded bg-blue-100">
-              ${renderStatus(item["CE Status"])}
-            </select>
-            <input type="number" class="border p-2 rounded" value="${item["Feedback count"] || ''}" placeholder="Feedback count">
-            <input type="date" class="border p-2 rounded" value="${item["Last feedback date"] || ''}" placeholder="Last feedback date">
-            <input type="date" class="border p-2 rounded" value="${item["Last checked date"] || ''}" placeholder="Last checked date">
+          <div class="mt-4">
+            <button onclick="window.close()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Đóng tab</button>
           </div>
-          <div class="mt-4 flex justify-end space-x-2">
-            <button class="bg-cyan-600 text-white px-4 py-2 rounded hover:bg-cyan-700">Save</button>
-            <button class="bg-gray-200 px-4 py-2 rounded hover:bg-gray-300" onclick="checkNoFeedback()">Checked no feedback</button>
-          </div>
-        </details>
-      `;
-
-      const container = document.getElementById("accordionContainer");
-      container.innerHTML = accordion;
-      container.classList.remove("hidden");
+        </body>
+        </html>
+      `);
     }
 
-    function calculateAging(dateStr){
+    function calculateAging(dateStr) {
       const received = new Date(dateStr);
       const today = new Date();
       const diff = Math.floor((today - received)/(1000*60*60*24));
       return isFinite(diff) && diff >= 0 ? diff : '-';
     }
 
-    function getColor(days){
+    function getColor(days) {
       if(days === '-') return '#6c757d';
-      if(days <=3) return '#22c55e';
-      if(days <=7) return '#eab308';
+      if(days <= 3) return '#22c55e';
+      if(days <= 7) return '#eab308';
       return '#ef4444';
-    }
-
-    function renderStatus(selected){
-      const options = [
-        {label: 'Created', color: 'bg-blue-100'},
-        {label: 'Being process', color: 'bg-yellow-100'},
-        {label: 'Appeal success', color: 'bg-green-100'},
-        {label: 'Appeal reject', color: 'bg-red-100'},
-        {label: 'Do not claim', color: 'bg-gray-100'},
-        {label: 'Need to follow', color: 'bg-purple-100'},
-        {label: 'Closed', color: 'bg-black text-white'}
-      ];
-      return options.map(opt => `<option class="${opt.color}" ${opt.label === selected ? 'selected':''}>${opt.label}</option>`).join('');
-    }
-
-    function copyLink(link){
-      navigator.clipboard.writeText(link);
-      alert("Đã copy: " + link);
-    }
-
-    function checkNoFeedback(){
-      alert("Đã checked. Cập nhật Last checked date = " + new Date().toLocaleDateString());
-      // xử lý logic lưu nếu cần
     }
 
     document.getElementById("searchInput").addEventListener("input", function() {
@@ -197,6 +123,3 @@
   </script>
 </body>
 </html>
-
-
-
