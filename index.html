@@ -74,47 +74,12 @@
     });
 
    function openNewTabWithDetails(item) {
-  const escapeHTML = str =>
-    String(str || '')
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;")
-      .replace(/'/g, "&#039;");
-
-  const parseDateDDMMYYYY = dateStr => {
-    const [d, m, y] = (dateStr || '').split('/');
-    return new Date(`${y}-${m}-${d}`);
-  };
-
-  const formatDateDDMMYYYYToInput = dateStr => {
-    if (!dateStr || !dateStr.includes('/')) return '';
-    const [d, m, y] = dateStr.split('/');
-    return `${y}-${m.padStart(2, '0')}-${d.padStart(2, '0')}`;
-  };
-
-  const today = new Date();
-  const recv = parseDateDDMMYYYY(item["Date received"]);
-  const aging = Math.floor((today - recv) / (1000 * 60 * 60 * 24));
-  const agingColor = aging >= 10
-    ? '#DC2626'
-    : aging >= 5
-      ? '#FACC15'
-      : '#16A34A';
-
-  if (!item._row) item._row = item.rowIndex ?? 2;
-  window.sharedEditData = {
-    ...item,
-    aging,
-    agingColor,
-    formattedDateReceived: formatDateDDMMYYYYToInput(item["Date received"])
-  };
-
-  window.open('/edit.html', '_blank');
+  
 }
   </script>
 </body>
 </html>
+
 
 
 
