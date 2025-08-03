@@ -183,7 +183,7 @@
     const item = raw ? JSON.parse(raw) : {};
 
     // SECTION 1: populate and style
-    document.getElementById('ownerName').value      = item['Date received'] || '';
+    document.getElementById('ownerName').value      =  '';
     document.getElementById('idField').value        = item['ID'] || '';
     document.getElementById('tracking').value       = item['Tracking'] || '';
     document.getElementById('trackingCR').value     = item['Tracking CR'] || '';
@@ -333,6 +333,7 @@ document.getElementById('aging').textContent = `${days} ngày`;
   </script>
 </body>
 </html>
+
 
 
 
