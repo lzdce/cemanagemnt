@@ -226,8 +226,23 @@
 
   return `${dd}/${mm}/${yyyy}`;
 }
-    const formatted = isoToDMY(item['Data received']);   // "21/05/2025"
-document.getElementById('dateReceived').value = formatted;
+    document.addEventListener('DOMContentLoaded', () => {
+    // 2. Lấy object đã lưu
+    const item = JSON.parse(sessionStorage.getItem('editItem') || '{}');
+
+    // 3. Đọc đúng key "Date received"
+    const rawDate = item['Date received'] || '';
+
+    // 4. Nếu rawDate là ISO thì convert, còn là "21/05/2025" rồi thì giữ nguyên
+    const displayDate =
+      typeof rawDate === 'string' && rawDate.includes('T')
+        ? isoToDMY(rawDate)
+        : rawDate;
+
+    // 5. Gán vào input
+    const el = document.getElementById('dateReceived');
+    if (el) el.value = displayDate;
+  });
 
 
 // Tách ngày để tính aging
@@ -344,6 +359,7 @@ document.getElementById('aging').textContent = `${days} ngày`;
   </script>
 </body>
 </html>
+
 
 
 
