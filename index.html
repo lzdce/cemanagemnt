@@ -98,35 +98,35 @@
   const agingColor = aging >= 10 ? '#DC2626' : aging >= 5 ? '#FACC15' : '#16A34A';
 
   const fullHTML = `
-    <!DOCTYPE html>
-    <html lang="vi">
-      <head>
-        <meta charset="UTF-8" />
-        <title>Chi tiết Case</title>
-        <script src="https://cdn.tailwindcss.com"></script>
-      </head>
-      <body class="bg-gray-100 text-sm text-gray-800 p-6">
-        <h2 class="text-xl font-semibold mb-4">📦 Thông tin Chi tiết</h2>
-        <div class="grid grid-cols-2 gap-4 mb-6">
-          <div><strong>Owner:</strong> ${escapeHTML(item["Owner name"])}</div>
-          <div><strong>ID:</strong> ${escapeHTML(item["ID"])}</div>
-          <div><strong>Tracking:</strong> ${escapeHTML(item["Tracking"])}</div>
-          <div><strong>Tracking CR:</strong> ${escapeHTML(item["Tracking CR"])}</div>
-          <div><strong>Type:</strong> <span class="${
-            item["Type"] === "CR" ? 'bg-red-500' :
-            item["Type"] === "FD" ? 'bg-green-500' : 'bg-gray-500'
-          } text-white px-2 py-1 rounded">${escapeHTML(item["Type"])}</span></div>
-          <div><strong>Description:</strong> ${escapeHTML(item["Description"])}</div>
-          <div><strong>Date received:</strong> ${escapeHTML(item["Date received"])}</div>
-          <div><strong>Aging backlog:</strong> <span class="px-2 py-1 rounded font-semibold" style="background:${agingColor};color:white;">${aging} ngày</span></div>
-          <div><strong>Brief case:</strong> ${escapeHTML(item["Brief case"])}</div>
-          <div><strong>Created date:</strong> ${formatDateDDMMYYYYToInput(item["Created date"])}</div>
-          <div><strong>Final date:</strong> ${formatDateDDMMYYYYToInput(item["Final date"])}</div>
-          <div><strong>Last feedback date:</strong> ${formatDateDDMMYYYYToInput(item["Last feedback date"])}</div>
-          <div><strong>Last checked date:</strong> ${formatDateDDMMYYYYToInput(item["Last checked date"])}</div>
-        </div>
-      </body>
-    </html>
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Chi tiết Case</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="bg-gray-100 text-sm text-gray-800 p-6">
+    <h2 class="text-xl font-semibold mb-4">📦 Thông tin Chi tiết</h2>
+    <div class="grid grid-cols-2 gap-4 mb-6">
+      <div><strong>Owner:</strong> ${escapeHTML(item["Owner name"])}</div>
+      <div><strong>ID:</strong> ${escapeHTML(item["ID"])}</div>
+      <div><strong>Tracking:</strong> ${escapeHTML(item["Tracking"])}</div>
+      <div><strong>Tracking CR:</strong> ${escapeHTML(item["Tracking CR"])}</div>
+      <div><strong>Type:</strong> <span class="${
+        item["Type"] === "CR" ? 'bg-red-500' :
+        item["Type"] === "FD" ? 'bg-green-500' : 'bg-gray-500'
+      } text-white px-2 py-1 rounded">${escapeHTML(item["Type"])}</span></div>
+      <div><strong>Description:</strong> ${escapeHTML(item["Description"])}</div>
+      <div><strong>Date received:</strong> ${escapeHTML(item["Date received"])}</div>
+      <div><strong>Aging backlog:</strong> <span class="px-2 py-1 rounded font-semibold" style="background:${agingColor};color:white;">${aging} ngày</span></div>
+      <div><strong>Brief case:</strong> ${escapeHTML(item["Brief case"])}</div>
+      <div><strong>Created date:</strong> ${formatDateDDMMYYYYToInput(item["Created date"])}</div>
+      <div><strong>Final date:</strong> ${formatDateDDMMYYYYToInput(item["Final date"])}</div>
+      <div><strong>Last feedback date:</strong> ${formatDateDDMMYYYYToInput(item["Last feedback date"])}</div>
+      <div><strong>Last checked date:</strong> ${formatDateDDMMYYYYToInput(item["Last checked date"])}</div>
+    </div>
+  </body>
+</html>
   `;
 
   const blob = new Blob([fullHTML], { type: 'text/html' });
@@ -136,6 +136,7 @@
   </script>
 </body>
 </html>
+
 
 
 
