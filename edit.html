@@ -1,347 +1,292 @@
+<!-- ✨ CE edit form – 2025-08-03 -->
 <!DOCTYPE html>
 <html lang="vi">
 <head>
   <meta charset="UTF-8" />
   <title>CE edit form</title>
+
+  <!-- Force fresh copy on GitHub Pages & browser -->
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma"        content="no-cache" />
+  <meta http-equiv="Expires"       content="0" />
+
   <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Giữ header + nút luôn hiển thị */
+    #stickyBar { position: sticky; top: 0; z-index: 50; }
+  </style>
 </head>
 <body class="bg-gray-100">
-  <div class="min-h-screen flex items-center justify-center p-4">
-    <div class="w-full max-w-3xl bg-white rounded-lg shadow-lg overflow-hidden">
-      
-      <!-- HEADER: TITLE + ACTION BUTTONS -->
-      <div class="flex items-center justify-between bg-blue-600 p-4">
-        <h1 class="text-xl font-semibold text-white">CE edit form</h1>
-        <div class="space-x-2">
-          <button id="noFeedbackBtn" 
-                  class="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded">
-            Checked no feedback
-          </button>
-          <button id="saveBtn" 
-                  class="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded">
-            Change
-          </button>
-        </div>
-      </div>
-      
-      <div class="p-6 space-y-6">
-
-        <!-- SECTION 1: INFORMATION -->
-        <div class="border rounded p-4 bg-gray-50">
-          <h2 class="text-lg font-semibold mb-4">Information</h2>
-          <div class="grid grid-cols-2 gap-4">
-
-            <div>
-              <label class="block text-sm font-medium text-gray-700">Owner name</label>
-              <input type="text" id="ownerName" 
-                     class="mt-1 w-full bg-gray-200 cursor-not-allowed border-gray-300 rounded p-2" 
-                     readonly>
-            </div>
-
-            <div>
-              <label class="block text-sm font-medium text-gray-700">ID</label>
-              <input type="text" id="idField" 
-                     class="mt-1 w-full bg-gray-200 cursor-not-allowed border-gray-300 rounded p-2" 
-                     readonly>
-            </div>
-
-            <div>
-              <label class="block text-sm font-medium text-gray-700">Tracking</label>
-              <input type="text" id="tracking" 
-                     class="mt-1 w-full bg-gray-200 cursor-not-allowed border-gray-300 rounded p-2" 
-                     readonly>
-            </div>
-
-            <div>
-              <label class="block text-sm font-medium text-gray-700">Tracking CR</label>
-              <input type="text" id="trackingCR" 
-                     class="mt-1 w-full bg-gray-200 cursor-not-allowed border-gray-300 rounded p-2" 
-                     readonly>
-            </div>
-
-            <div>
-              <label class="block text-sm font-medium text-gray-700">Type</label>
-              <span id="type" 
-                    class="mt-1 inline-block w-full bg-gray-200 cursor-not-allowed border border-gray-300 rounded p-2">
-              </span>
-            </div>
-
-            <div>
-              <label class="block text-sm font-medium text-gray-700">Description</label>
-              <textarea id="description" rows="2" 
-                        class="mt-1 w-full bg-gray-200 cursor-not-allowed border-gray-300 rounded p-2" 
-                        readonly></textarea>
-            </div>
-
-            <div>
-              <label class="block text-sm font-medium text-gray-700">Video OB</label>
-              <div id="videoOBContainer" 
-                   class="mt-1 w-full bg-gray-200 border border-gray-300 rounded p-2">
-              </div>
-            </div>
-
-            <div>
-              <label class="block text-sm font-medium text-gray-700">Date received</label>
-              <input type="date" id="dateReceived" 
-                     class="mt-1 w-full bg-gray-200 cursor-not-allowed border-gray-300 rounded p-2" 
-                     readonly>
-            </div>
-
-            <div>
-              <label class="block text-sm font-medium text-gray-700">Aging backlog</label>
-              <span id="aging" 
-                    class="mt-1 inline-block w-full bg-gray-200 cursor-not-allowed border border-gray-300 rounded p-2">
-              </span>
-            </div>
-
-          </div>
-        </div>
-
-        <!-- SECTION 2: STATUS -->
-        <div class="border rounded p-4 bg-white">
-          <h2 class="text-lg font-semibold mb-4">Status</h2>
-          <div class="grid grid-cols-2 gap-4">
-
-            <div>
-              <label class="block text-sm font-medium text-gray-700">Brief case</label>
-              <input type="text" id="briefCase" 
-                     class="mt-1 w-full bg-gray-200 cursor-not-allowed border-gray-300 rounded p-2" 
-                     readonly>
-            </div>
-
-            <div>
-              <label class="block text-sm font-medium text-gray-700">Created date</label>
-              <input type="date" id="createdDate" 
-                     class="mt-1 w-full border-gray-300 rounded p-2">
-            </div>
-
-            <div>
-              <label class="block text-sm font-medium text-gray-700">Final date</label>
-              <input type="date" id="finalDate" 
-                     class="mt-1 w-full border-gray-300 rounded p-2">
-            </div>
-
-            <div class="col-span-2">
-              <label class="block text-sm font-medium text-gray-700">CE Status</label>
-              <select id="ceStatus" 
-                      class="mt-1 w-full border-gray-300 rounded p-2">
-                <option value="">– Chọn trạng thái –</option>
-                <option>Created</option>
-                <option>Being process</option>
-                <option>Appeal success</option>
-                <option>Appeal reject</option>
-                <option>Do not claim</option>
-                <option>Need to follow</option>
-                <option>Closed</option>
-              </select>
-            </div>
-
-            <div>
-              <label class="block text-sm font-medium text-gray-700">Reason dispute</label>
-              <textarea id="reasonDispute" rows="2" 
-                        class="mt-1 w-full border-gray-300 rounded p-2"></textarea>
-            </div>
-
-            <div>
-              <label class="block text-sm font-medium text-gray-700">Feedback count</label>
-              <input type="number" id="feedbackCount" min="0" 
-                     class="mt-1 w-full border-gray-300 rounded p-2">
-            </div>
-
-            <div>
-              <label class="block text-sm font-medium text-gray-700">Last feedback date</label>
-              <input type="date" id="lastFeedbackDate" 
-                     class="mt-1 w-full border-gray-300 rounded p-2">
-            </div>
-
-            <div>
-              <label class="block text-sm font-medium text-gray-700">Last checked date</label>
-              <input type="date" id="lastCheckedDate" 
-                     class="mt-1 w-full border-gray-300 rounded p-2">
-            </div>
-
-          </div>
-        </div>
-
-      </div>
+  <!-- STICKY BAR -->
+  <div id="stickyBar" class="flex items-center justify-between bg-blue-600 p-4">
+    <h1 class="text-lg font-semibold text-white">CE edit form</h1>
+    <div class="space-x-2">
+      <button id="noFeedbackBtn"
+              class="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded">
+        Checked no feedback
+      </button>
+      <button id="saveBtn"
+              class="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded">
+        Save
+      </button>
     </div>
   </div>
 
+  <!-- MAIN CONTENT -->
+  <div class="max-w-3xl mx-auto p-6 space-y-6">
+
+    <!-- Information -->
+    <section class="border rounded bg-gray-50 p-4">
+      <h2 class="font-semibold text-gray-700 mb-4">Information</h2>
+      <div class="grid grid-cols-2 gap-4 text-sm">
+
+        <div>
+          <label class="block">Owner name</label>
+          <input id="ownerName" class="w-full bg-gray-200 rounded p-2" readonly />
+        </div>
+
+        <div>
+          <label class="block">ID</label>
+          <input id="idField" class="w-full bg-gray-200 rounded p-2" readonly />
+        </div>
+
+        <div>
+          <label class="block">Tracking</label>
+          <input id="tracking" class="w-full bg-gray-200 rounded p-2" readonly />
+        </div>
+
+        <div>
+          <label class="block">Tracking CR</label>
+          <input id="trackingCR" class="w-full bg-gray-200 rounded p-2" readonly />
+        </div>
+
+        <div>
+          <label class="block">Type</label>
+          <span id="typeBadge" class="inline-block w-full rounded p-2 bg-gray-200"></span>
+        </div>
+
+        <div>
+          <label class="block">Description</label>
+          <textarea id="description" rows="2"
+                    class="w-full bg-gray-200 rounded p-2" readonly></textarea>
+        </div>
+
+        <div>
+          <label class="block">Video OB</label>
+          <div id="videoOBBox" class="w-full bg-gray-200 rounded p-2"></div>
+        </div>
+
+        <div>
+          <label class="block">Date received (dd/mm/yyyy)</label>
+          <input id="dateReceivedTxt"
+                 class="w-full bg-gray-200 rounded p-2" readonly />
+        </div>
+
+        <div>
+          <label class="block">Aging backlog</label>
+          <span id="agingBadge" class="inline-block w-full rounded p-2 bg-gray-200"></span>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Status -->
+    <section class="border rounded bg-white p-4">
+      <h2 class="font-semibold text-gray-700 mb-4">Status</h2>
+      <div class="grid grid-cols-2 gap-4 text-sm">
+
+        <div>
+          <label class="block">Brief case</label>
+          <input id="briefCase" class="w-full bg-gray-200 rounded p-2" readonly />
+        </div>
+
+        <div>
+          <label class="block">Created date</label>
+          <input type="date" id="createdDate" class="w-full border rounded p-2" />
+        </div>
+
+        <div>
+          <label class="block">Final date</label>
+          <input type="date" id="finalDate" class="w-full border rounded p-2" />
+        </div>
+
+        <div class="col-span-2">
+          <label class="block">CE Status</label>
+          <select id="ceStatus" class="w-full border rounded p-2">
+            <option value="">— Chọn trạng thái —</option>
+            <option>Created</option>
+            <option>Being process</option>
+            <option>Appeal success</option>
+            <option>Appeal reject</option>
+            <option>Do not claim</option>
+            <option>Need to follow</option>
+            <option>Closed</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block">Reason dispute</label>
+          <textarea id="reasonDispute" rows="2" class="w-full border rounded p-2"></textarea>
+        </div>
+
+        <div>
+          <label class="block">Feedback count</label>
+          <input type="number" id="feedbackCount" min="0" class="w-full border rounded p-2" />
+        </div>
+
+        <div>
+          <label class="block">Last feedback date</label>
+          <input type="date" id="lastFeedbackDate" class="w-full border rounded p-2" />
+        </div>
+
+        <div>
+          <label class="block">Last checked date</label>
+          <input type="date" id="lastCheckedDate" class="w-full border rounded p-2" />
+        </div>
+
+      </div>
+    </section>
+  </div>
+
   <script>
-    // helper: format DD/MM/YYYY ➔ YYYY-MM-DD
-    function toInputDate(str) {
-      if (!str) return '';
-      if (str.includes('/')) {
-        const [d, m, y] = str.split('/');
+    /***** Helpers *****/
+    const toInputDate = s => {
+      if (!s) return '';
+      // nếu chuỗi có "/", giả sử DD/MM/YYYY
+      if (s.includes('/')) {
+        const [d,m,y] = s.split('/');
         return `${y}-${m.padStart(2,'0')}-${d.padStart(2,'0')}`;
       }
-      return str;
-    }
-
-    // load item
-    const raw = sessionStorage.getItem('editItem');
-    const item = raw ? JSON.parse(raw) : {};
-
-    // SECTION 1: populate and style
-    document.getElementById('ownerName').value      = item['Owner name'] || '';
-    document.getElementById('idField').value        = item['ID'] || '';
-    document.getElementById('tracking').value       = item['Tracking'] || '';
-    document.getElementById('trackingCR').value     = item['Tracking CR'] || '';
-    document.getElementById('description').value    = item['Description'] || '';
-
-    // Type color
-    const tEl = document.getElementById('type');
-    if (item.Type === 'CR') {
-      tEl.textContent = 'CR';
-      tEl.classList.add('text-red-600');
-    } else if (item.Type === 'FD') {
-      tEl.textContent = 'FD';
-      tEl.classList.add('text-green-600');
-    } else {
-      tEl.textContent = item.Type || '';
-    }
-
-    // Video OB
-    const vBox = document.getElementById('videoOBContainer');
-    if (item['Video OB']) {
-      const btn = document.createElement('button');
-      btn.textContent = 'Copy link';
-      btn.className = 'text-blue-600 underline';
-      btn.addEventListener('click', () => {
-        navigator.clipboard.writeText(item['Video OB']);
-      });
-      vBox.appendChild(btn);
-    } else {
-      vBox.textContent = 'Chưa update';
-    }
-
-    // Date received & aging
-    const dr = toInputDate(item['Date received']);
-    document.getElementById('dateReceived').value = dr;
-    const recv = new Date(dr);
-    const days = isNaN(recv)
-      ? 0
-      : Math.floor((new Date() - recv) / (1000*60*60*24));
-    document.getElementById('aging').textContent = `${days} ngày`;
-
-    // SECTION 2: initial vs current
-    const orig = {
-      'Brief case': item['Brief case'] || '',
-      'Created date': toInputDate(item['Created date']),
-      'Final date': toInputDate(item['Final date']),
-      'CE Status': item['CE Status'] || '',
-      'Reason dispute': item['Reason dispute'] || '',
-      'Feedback count': item['Feedback count'] || '',
-      'Last feedback date': toInputDate(item['Last feedback date']),
-      'Last checked date': toInputDate(item['Last checked date'])
+      return s; // đã là yyyy-mm-dd
+    };
+    const toDisplayDate = s => {
+      if (!s) return '';
+      // nếu đã yyyy-mm-dd, chuyển ngược lại
+      if (s.includes('-')) {
+        const [y,m,d] = s.split('-');
+        return `${d.padStart(2,'0')}/${m.padStart(2,'0')}/${y}`;
+      }
+      return s; // đã DD/MM/YYYY
     };
 
-    // fill Section 2
-    document.getElementById('briefCase').value      = orig['Brief case'];
-    document.getElementById('createdDate').value    = orig['Created date'];
-    document.getElementById('finalDate').value      = orig['Final date'];
-    const ceSel = document.getElementById('ceStatus');
-    ceSel.value = orig['CE Status'];
-    document.getElementById('reasonDispute').value = orig['Reason dispute'];
-    document.getElementById('feedbackCount').value = orig['Feedback count'];
-    document.getElementById('lastFeedbackDate').value = orig['Last feedback date'];
-    document.getElementById('lastCheckedDate').value  = orig['Last checked date'];
+    /***** Load item từ sessionStorage *****/
+    const raw   = sessionStorage.getItem('editItem');
+    if (!raw) { alert('Không tìm thấy dữ liệu'); window.close(); }
+    const item  = JSON.parse(raw);
+    const orig  = {};   // Lưu giá trị gốc để so sánh
 
-    // color CE Status
-    function updateStatusColor() {
-      ceSel.classList.remove(
-        'bg-blue-200','bg-yellow-200','bg-green-200',
-        'bg-red-200','bg-gray-200','bg-purple-200',
-        'bg-black','text-white'
-      );
-      const v = ceSel.value;
-      if (v === 'Created')          ceSel.classList.add('bg-blue-200');
-      else if (v === 'Being process') ceSel.classList.add('bg-yellow-200');
-      else if (v === 'Appeal success') ceSel.classList.add('bg-green-200');
-      else if (v === 'Appeal reject')  ceSel.classList.add('bg-red-200');
-      else if (v === 'Do not claim')   ceSel.classList.add('bg-gray-200');
-      else if (v === 'Need to follow') ceSel.classList.add('bg-purple-200');
-      else if (v === 'Closed')         ceSel.classList.add('bg-black','text-white');
-    }
-    ceSel.addEventListener('change', updateStatusColor);
-    updateStatusColor();
+    // --- Fill Information ---
+    document.getElementById('ownerName').value    = item['Owner name'] || '';
+    document.getElementById('idField').value      = item.ID || '';
+    document.getElementById('tracking').value     = item.Tracking || '';
+    document.getElementById('trackingCR').value   = item['Tracking CR'] || '';
+    document.getElementById('description').value  = item.Description || '';
 
-    // NO FEEDBACK BUTTON
-    document.getElementById('noFeedbackBtn').addEventListener('click', () => {
+    // Type badge
+    const typeEl = document.getElementById('typeBadge');
+    if (item.Type === 'CR')    { typeEl.textContent = 'CR'; typeEl.classList.add('text-red-600'); }
+    else if (item.Type === 'FD'){ typeEl.textContent = 'FD'; typeEl.classList.add('text-green-600'); }
+    else                        typeEl.textContent = item.Type || '';
+
+    // Video OB
+    const vBox = document.getElementById('videoOBBox');
+    if (item['Video OB']) {
+      const linkBtn = document.createElement('button');
+      linkBtn.textContent = 'Copy link';
+      linkBtn.className = 'text-blue-600 underline';
+      linkBtn.onclick  = () => navigator.clipboard.writeText(item['Video OB']);
+      vBox.appendChild(linkBtn);
+    } else vBox.textContent = 'Chưa update';
+
+    // Date received & aging
+    const drDisp = toDisplayDate(item['Date received']);
+    document.getElementById('dateReceivedTxt').value = drDisp;
+    const recvDate = new Date(toInputDate(drDisp));
+    const days = isNaN(recvDate) ? 0 :
+                 Math.floor((Date.now() - recvDate.getTime()) / 86400000);
+    document.getElementById('agingBadge').textContent = `${days} ngày`;
+
+    // --- Fill Status ---
+    const set = (id, val) => document.getElementById(id).value = val || '';
+    set('briefCase',        item['Brief case']);
+    set('createdDate',      toInputDate(item['Created date']));
+    set('finalDate',        toInputDate(item['Final date']));
+    set('ceStatus',         item['CE Status']);
+    set('reasonDispute',    item['Reason dispute']);
+    set('feedbackCount',    item['Feedback count']);
+    set('lastFeedbackDate', toInputDate(item['Last feedback date']));
+    set('lastCheckedDate',  toInputDate(item['Last checked date']));
+
+    // Lưu orig
+    ['Created date','Final date','CE Status',
+     'Reason dispute','Feedback count','Last checked date'
+    ].forEach(k => orig[k] = item[k] || '');
+
+    /***** Checked no feedback *****/
+    document.getElementById('noFeedbackBtn').addEventListener('click', async () => {
       const curr = {
-        'Created date': document.getElementById('createdDate').value,
-        'Final date': document.getElementById('finalDate').value,
-        'CE Status': ceSel.value,
-        'Reason dispute': document.getElementById('reasonDispute').value,
-        'Feedback count': document.getElementById('feedbackCount').value,
+        'Created date':      document.getElementById('createdDate').value,
+        'Final date':        document.getElementById('finalDate').value,
+        'CE Status':         document.getElementById('ceStatus').value,
+        'Reason dispute':    document.getElementById('reasonDispute').value,
+        'Feedback count':    document.getElementById('feedbackCount').value,
         'Last checked date': document.getElementById('lastCheckedDate').value
       };
-      let changed = false;
-      for (let k in curr) {
-        if (curr[k] !== orig[k]) { changed = true; break; }
+      const isChanged = Object.keys(curr).some(k => toDisplayDate(curr[k]) !== orig[k]);
+
+      if (isChanged) {
+        const ok = confirm('Bạn đã change data, bạn có muốn bỏ qua data đã change và chỉ cập nhật Last checked không?');
+        if (!ok) return;
       }
-      function onlyUpdateLastFB() {
-        const today = new Date().toISOString().slice(0,10);
-        window.opener.postMessage(
-          { _row: item._row, 'Last checked': today },
-          '*'
-        );
-        fetch('https://lzdcemanagement.phuonghoangcao1703.workers.dev/update', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(updatedData)
-  })
-    .then(response => {
-      if (!response.ok) throw new Error('Không thể cập nhật Google Sheet');
-      // Cập nhật cho giao diện bên ngoài
-      window.opener.postMessage(updatedData, '*');
+
+      const today = new Date().toISOString().slice(0,10);
+      await pushToSheet({ _row: item._row, 'Last checked date': today });
+      window.opener.postMessage({ _row: item._row, 'Last checked date': today }, '*');
       sessionStorage.removeItem('editItem');
       window.close();
-    })
-    .catch(err => alert('Lỗi khi cập nhật: ' + err.message));
-}
-        sessionStorage.removeItem('editItem');
-        window.close();
-      }
-      if (changed) {
-        if (confirm('Bạn đã change data, hãy confirm nếu bạn đồng ý chỉ change Last feedback')) {
-          onlyUpdateLastFB();
-        }
-      } else {
-        onlyUpdateLastFB();
-      }
     });
 
-    // SAVE / CHANGE BUTTON
-    document.getElementById('saveBtn').addEventListener('click', () => {
-      const updated = { _row: item._row };
-      const fields = [
-        'Brief case','Created date','Final date',
-        'CE Status','Reason dispute','Feedback count',
-        'Last feedback date','Last checked date'
-      ];
-      fields.forEach(key => {
-        let val = '';
-        switch (key) {
-          case 'Brief case':      val = document.getElementById('briefCase').value; break;
-          case 'Created date':    val = document.getElementById('createdDate').value; break;
-          case 'Final date':      val = document.getElementById('finalDate').value; break;
-          case 'CE Status':       val = ceSel.value; break;
-          case 'Reason dispute':  val = document.getElementById('reasonDispute').value; break;
-          case 'Feedback count':  val = document.getElementById('feedbackCount').value; break;
-          case 'Last feedback date': val = document.getElementById('lastFeedbackDate').value; break;
-          case 'Last checked date':  val = document.getElementById('lastCheckedDate').value; break;
-        }
-        updated[key] = val;
-      });
-      window.opener.postMessage(updated, '*');
+    /***** SAVE *****/
+    document.getElementById('saveBtn').addEventListener('click', async () => {
+      const payload = { _row: item._row };
+
+      const collect = (key, id, transform = v => v) => {
+        const val = transform(document.getElementById(id).value);
+        if (val !== orig[key]) payload[key] = val;
+      };
+
+      collect('Created date',      'createdDate',      toDisplayDate);
+      collect('Final date',        'finalDate',        toDisplayDate);
+      collect('CE Status',         'ceStatus');
+      collect('Reason dispute',    'reasonDispute');
+      collect('Feedback count',    'feedbackCount');
+      collect('Last feedback date','lastFeedbackDate', toDisplayDate);
+      collect('Last checked date', 'lastCheckedDate',  toDisplayDate);
+
+      if (Object.keys(payload).length === 1) {
+        alert('Không có gì thay đổi!');
+        return;
+      }
+
+      await pushToSheet(payload);
+      window.opener.postMessage(payload, '*');
       sessionStorage.removeItem('editItem');
       window.close();
     });
+
+    /***** Gửi cập nhật đến Cloudflare Worker *****/
+    async function pushToSheet(obj) {
+      const res = await fetch('https://lzdcemanagement.phuonghoangcao1703.workers.dev/update', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(obj)
+      });
+      if (!res.ok) {
+        const t = await res.text();
+        alert('Không thể cập nhật Google Sheet: ' + t);
+        throw new Error(t);
+      }
+    }
   </script>
 </body>
 </html>
-
-
-
-
