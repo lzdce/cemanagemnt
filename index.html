@@ -5,8 +5,9 @@
   <title>CE MANAGEMENT</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-100 p-8">
-  <h2 class="text-2xl font-semibold mb-6">Dashboard Google Sheet</h2>
+<body class="bg-gray-100 p-8 text-gray-800">
+  <h2 class="text-2xl font-semibold mb-6">📊 Dashboard Google Sheet</h2>
+
   <input type="text" id="searchInput" placeholder="Tìm kiếm..." class="mb-6 px-4 py-2 border rounded w-80">
 
   <table class="w-full bg-white rounded shadow mb-6">
@@ -34,8 +35,10 @@
       if (!data.length) return;
 
       const keys = Object.keys(data[0]);
+
       const header = document.createElement("tr");
-      header.innerHTML = `<th class="px-4 py-2">✏️</th>` + keys.map(k => `<th class="px-4 py-2">${k}</th>`).join('');
+      header.innerHTML = `<th class="px-4 py-2">✏️</th>` +
+        keys.map(k => `<th class="px-4 py-2 text-left">${k}</th>`).join('');
       thead.appendChild(header);
 
       data.forEach(item => {
@@ -60,60 +63,6 @@
       });
     }
 
-    function formatDateDDMMYYYYToInput(dateStr) {
-      if (!dateStr || !dateStr.includes('-')) return '';
-      const parts = dateStr.split('-');
-      if (parts.length !== 3) return '';
-      const [dd, mm, yyyy] = parts;
-      return `${yyyy}-${mm.padStart(2,'0')}-${dd.padStart(2,'0')}`;
-    }
-
-    function openNewTabWithDetails(item) {
-  const win = window.open('', '_blank');
-
-  if (!win) return alert('Không thể mở tab mới');
-
-  const doc = win.document;
-  const html = doc.documentElement;
-  doc.open();
-
-  const container = doc.createElement('html');
-  container.innerHTML = `
-    <head>
-      <title>Thông tin chi tiết</title>
-      <script src="https://cdn.tailwindcss.com"></script>
-    </head>
-    <body class="bg-gray-100 text-gray-800 p-6">
-      <div class="max-w-xl mx-auto bg-white rounded shadow p-4">
-        <h1 class="text-xl font-bold mb-2">Thông tin: ${item["Tên"]}</h1>
-        <p><strong>Trạng thái:</strong> ${item["TrạngThái"]}</p>
-        <p><strong>Loại:</strong> ${item["Loại"]}</p>
-        <!-- Thêm các field khác ở đây -->
-      </div>
-    </body>
-  `;
-
-  doc.write(container.outerHTML);
-  doc.close();
-}
-
-    function calculateAging(dateStr) {
-      const parts = dateStr.split('-');
-      if (parts.length !== 3) return '-';
-      const [dd, mm, yyyy] = parts;
-      const received = new Date(`${yyyy}-${mm}-${dd}`);
-      const today = new Date();
-      const diff = Math.floor((today - received) / (1000 * 60 * 60 * 24));
-      return isFinite(diff) && diff >= 0 ? diff : '-';
-    }
-
-    function getColor(days) {
-      if (days === '-') return '#6c757d';
-      if (days <= 3) return '#22c55e';
-      if (days <= 7) return '#eab308';
-      return '#ef4444';
-    }
-
     document.getElementById("searchInput").addEventListener("input", function () {
       const keyword = this.value.toLowerCase();
       const filtered = originalData.filter(item =>
@@ -123,7 +72,56 @@
       );
       renderTable(filtered);
     });
+
+    function openNewTabWithDetails(item) {
+      const win = window.open('', '_blank');
+      if (!win) return alert('Không thể mở tab mới');
+
+      const doc = win.document;
+      doc.open();
+
+      const html = doc.createElement('html');
+      html.setAttribute('lang', 'vi');
+
+      const head = doc.createElement('head');
+      const meta = doc.createElement('meta');
+      meta.setAttribute('charset', 'UTF-8');
+      head.appendChild(meta);
+
+      const title = doc.createElement('title');
+      title.textContent = 'Thông tin chi tiết';
+      head.appendChild(title);
+
+      const script = doc.createElement('script');
+      script.src = 'https://cdn.tailwindcss.com';
+      head.appendChild(script);
+
+      html.appendChild(head);
+
+      const body = doc.createElement('body');
+      body.className = 'bg-gray-100 text-gray-800 p-6';
+
+      const container = doc.createElement('div');
+      container.className = 'max-w-xl mx-auto bg-white rounded shadow p-4';
+
+      const heading = doc.createElement('h1');
+      heading.className = 'text-xl font-bold mb-4';
+      heading.textContent = `Thông tin: ${item["Tên"]}`;
+      container.appendChild(heading);
+
+      Object.entries(item).forEach(([key, value]) => {
+        const p = doc.createElement('p');
+        p.className = 'mb-2';
+        p.innerHTML = `<strong>${key}:</strong> ${value || '-'}`;
+        container.appendChild(p);
+      });
+
+      body.appendChild(container);
+      html.appendChild(body);
+
+      doc.write('<!DOCTYPE html>\n' + html.outerHTML);
+      doc.close();
+    }
   </script>
 </body>
 </html>
-
