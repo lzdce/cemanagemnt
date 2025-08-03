@@ -215,21 +215,21 @@
       vBox.textContent = 'Chưa update';
     }
 
-    // Date received & aging
+   // Dữ liệu ban đầu kiểu dd/mm/yyyy
 const rawDate = item['Date received']; // ví dụ: "20/05/2025"
-const [day, month, year] = rawDate.split('/');
 
-document.getElementById('dateReceived').value = `${year}-${month}-${day}`;
+// Gán trực tiếp vào input dạng text
+document.getElementById('dateReceived').value = rawDate;
 
-// Tách ngày, tháng, năm
-const [day, month, year] = drRaw.split('/').map(Number);
-const recv = new Date(year, month - 1, day); // tháng tính từ 0
-
-const days = isNaN(recv)
-  ? 0
-  : Math.floor((new Date() - recv) / (1000 * 60 * 60 * 24));
+// Tách ngày để tính aging
+const [day, month, year] = rawDate.split('/').map(Number);
+const recv = new Date(year, month - 1, day); // tháng JS bắt đầu từ 0
+const days = !isNaN(recv)
+  ? Math.floor((new Date() - recv) / (1000 * 60 * 60 * 24))
+  : 0;
 
 document.getElementById('aging').textContent = `${days} ngày`;
+
 
 
     // SECTION 2: initial vs current
@@ -335,5 +335,6 @@ document.getElementById('aging').textContent = `${days} ngày`;
   </script>
 </body>
 </html>
+
 
 
