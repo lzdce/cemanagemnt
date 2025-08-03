@@ -74,9 +74,6 @@
     });
 
     function openNewTabWithDetails(item) {
-  const win = window.open('', '_blank');
-  if (!win) return alert('Không thể mở tab mới');
-
   const escapeHTML = str =>
     String(str)
       .replace(/&/g, "&amp;")
@@ -99,10 +96,6 @@
   const receivedDate = parseDateDDMMYYYY(item["Date received"]);
   const aging = Math.floor((today - receivedDate) / (1000 * 60 * 60 * 24));
   const agingColor = aging >= 10 ? '#DC2626' : aging >= 5 ? '#FACC15' : '#16A34A';
-
-  const fieldsHTML = Object.entries(item).map(([key, value]) =>
-    `<p><strong>${escapeHTML(key)}:</strong> ${escapeHTML(value || '-')}</p>`
-  ).join('');
 
   const fullHTML = `
     <!DOCTYPE html>
@@ -136,12 +129,14 @@
     </html>
   `;
 
-  win.document.write(fullHTML);
-  win.document.close();
+  const blob = new Blob([fullHTML], { type: 'text/html' });
+  const url = URL.createObjectURL(blob);
+  window.open(url, '_blank');
 }
   </script>
 </body>
 </html>
+
 
 
 
