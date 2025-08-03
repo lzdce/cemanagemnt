@@ -317,35 +317,30 @@ document.getElementById('aging').textContent = `${days} ngày`;
 
     // NO FEEDBACK BUTTON
     document.getElementById('noFeedbackBtn').addEventListener('click', () => {
-      const curr = {
-        'Created date': document.getElementById('createdDate').value,
-        'Final date': document.getElementById('finalDate').value,
-        'CE Status': ceSel.value,
-        'Reason dispute': document.getElementById('reasonDispute').value,
-        'Feedback count': document.getElementById('feedbackCount').value,
-        'Last checked date': document.getElementById('lastCheckedDate').value
-      };
-      let changed = false;
-      for (let k in curr) {
-        if (curr[k] !== orig[k]) { changed = true; break; }
-      }
-      function onlyUpdateLastFB() {
-        const today = new Date().toISOString().slice(0,10);
-        window.opener.postMessage(
-          { _row: item._row, 'Last feedback date': today },
-          '*'
-        );
-        sessionStorage.removeItem('editItem');
-        window.close();
-      }
-      if (changed) {
-        if (confirm('Bạn đã change data, hãy confirm nếu bạn đồng ý chỉ change Last feedback date')) {
-          onlyUpdateLastFB();
-        }
-      } else {
+    // Lấy dữ liệu hiện tại
+    const curr = {
+      'Created date':     document.getElementById('createdDate').value,
+      'Final date':       document.getElementById('finalDate').value,
+      'CE Status':        ceSel.value,
+      'Reason dispute':   document.getElementById('reasonDispute').value,
+      'Feedback count':   document.getElementById('feedbackCount').value,
+      'Last checked date':document.getElementById('lastCheckedDate').value
+    };
+
+    // Kiểm tra xem có thay đổi gì so với orig không
+    const changed = Object.keys(curr).some(key => curr[key] !== orig[key]);
+
+    if (changed) {
+      const confirmMsg = 
+        'Bạn đã thay đổi dữ liệu trên form.\n' +
+        'Chọn OK để chỉ cập nhật "Last feedback date" hoặc Hủy để chỉnh sửa tiếp.';
+      if (confirm(confirmMsg)) {
         onlyUpdateLastFB();
       }
-    });
+    } else {
+      onlyUpdateLastFB();
+    }
+  });
 
     // SAVE / CHANGE BUTTON
     document.getElementById('saveBtn').addEventListener('click', () => {
@@ -376,6 +371,7 @@ document.getElementById('aging').textContent = `${days} ngày`;
   </script>
 </body>
 </html>
+
 
 
 
