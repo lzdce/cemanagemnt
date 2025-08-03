@@ -216,60 +216,7 @@
     }
 
    // Data received
-    function isoToDMY(isoString) {
-    const d = new Date(isoString);
-    if (isNaN(d)) return '';         // invalid → trả về chuỗi rỗng
-
-    const dd = String(d.getDate()).padStart(2, '0');
-    const mm = String(d.getMonth() + 1).padStart(2, '0');
-    const yyyy = d.getFullYear();
-    return `${dd}/${mm}/${yyyy}`;
-  }
-
-  document.addEventListener('DOMContentLoaded', () => {
-    // 2. Lấy object đã lưu
-    const item = JSON.parse(sessionStorage.getItem('editItem') || '{}');
-    const rawDate = item['Date received'] || '';
-
-    // 3. Convert nếu cần, nếu kết quả rỗng thì fallback về rawDate
-    let displayDate;
-    if (rawDate.includes('T')) {
-      displayDate = isoToDMY(rawDate) || rawDate;
-    } else {
-      displayDate = rawDate;
-    }
-
-    // 4. Gán vào input
-    const el = document.getElementById('dateReceived');
-    if (el) el.value = displayDate;
-  })
-    document.addEventListener('DOMContentLoaded', () => {
-    // 2. Lấy object đã lưu
-    const item = JSON.parse(sessionStorage.getItem('editItem') || '{}');
-
-    // 3. Đọc đúng key "Date received"
-    const rawDate = item['Date received'] || '';
-
-    // 4. Nếu rawDate là ISO thì convert, còn là "21/05/2025" rồi thì giữ nguyên
-    const displayDate =
-      typeof rawDate === 'string' && rawDate.includes('T')
-        ? isoToDMY(rawDate)
-        : rawDate;
-
-    // 5. Gán vào input
-    const el = document.getElementById('dateReceived');
-    if (el) el.value = displayDate;
-  });
-
-
-// Tách ngày để tính aging
-const [day, month, year] = rawDate.split('/').map(Number);
-const recv = new Date(year, month - 1, day); // tháng JS bắt đầu từ 0
-const days = !isNaN(recv)
-  ? Math.floor((new Date() - recv) / (1000 * 60 * 60 * 24))
-  : 0;
-
-document.getElementById('aging').textContent = `${days} ngày`;
+   
 
 
 
@@ -371,6 +318,7 @@ document.getElementById('aging').textContent = `${days} ngày`;
   </script>
 </body>
 </html>
+
 
 
 
