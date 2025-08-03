@@ -49,7 +49,7 @@
     const btn = document.createElement("button");
     btn.className = "text-blue-600 hover:underline";
     btn.textContent = "✏️";
-    btn.onclick = () => showDetails(item);
+    btn.onclick = () => openNewTabWithDetails(item);
     btnTd.appendChild(btn);
     tr.appendChild(btnTd);
 
@@ -64,6 +64,39 @@
   });
 }
 
+    function openNewTabWithDetails(item) {
+  const detailWindow = window.open('', '_blank');
+  const aging = calculateAging(item["Date received"]);
+  const agingColor = getColor(aging);
+
+  detailWindow.document.write(`
+    <!DOCTYPE html>
+    <html lang="vi">
+    <head>
+      <meta charset="UTF-8">
+      <title>Chi tiết Case</title>
+      <script src="https://cdn.tailwindcss.com"></script>
+    </head>
+    <body class="p-6 bg-gray-100 text-sm text-gray-800">
+      <h2 class="text-xl font-semibold mb-4">📦 Thông tin Chi tiết</h2>
+      <div class="grid grid-cols-2 gap-4 mb-6">
+        <div><strong>Owner:</strong> ${item["Owner name"] || ''}</div>
+        <div><strong>ID:</strong> ${item["ID"] || ''}</div>
+        <div><strong>Tracking:</strong> ${item["Tracking"] || ''}</div>
+        <div><strong>Tracking CR:</strong> ${item["Tracking CR"] || ''}</div>
+        <div><strong>Type:</strong> <span class="${item["Type"]==='CR' ? 'bg-red-500' : 'bg-green-500'} text-white px-2 py-1 rounded">${item["Type"] || ''}</span></div>
+        <div><strong>Description:</strong> ${item["Description"] || ''}</div>
+        <div><strong>Date received:</strong> ${item["Date received"] || ''}</div>
+        <div><strong>Aging backlog:</strong> <span class="px-2 py-1 rounded font-semibold" style="background:${agingColor};color:white;">${aging} ngày</span></div>
+        <div><strong>Brief case:</strong> ${item["Brief case"] || ''}</div>
+      </div>
+      <div class="mt-4">
+        <button onclick="window.close()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Đóng tab</button>
+      </div>
+    </body>
+    </html>
+  `);
+}
     function showDetails(encodedItem) {
       currentItem = item;
   const aging = calculateAging(item["Date received"]);
@@ -161,4 +194,5 @@
   </script>
 </body>
 </html>
+
 
