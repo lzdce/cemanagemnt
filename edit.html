@@ -52,7 +52,7 @@
     };
 
     // 3. Điền form
-    document.querySelector('[name="Owner name"]').value        = escapeHTML(item[1]);
+    document.querySelector('[name="Owner name"]').value        = escapeHTML(item["Owner name"]);
     document.querySelector('[name="ID"]').value                = escapeHTML(item[2]);
     document.querySelector('[name="Tracking"]').value          = escapeHTML(item[3]);
     document.querySelector('[name="Tracking CR"]').value       = escapeHTML(item[4]);
@@ -90,5 +90,6 @@
   </script>
 </body>
 </html>
+
 
 
