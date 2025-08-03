@@ -24,6 +24,7 @@
     const DATA_URL = 'https://lzdcemanagement.phuonghoangcao1703.workers.dev/';
     let originalData = [];
 
+    // 1. Fetch và render lần đầu
     fetch(DATA_URL)
       .then(r => r.json())
       .then(data => {
@@ -31,6 +32,7 @@
         renderTable(originalData);
       });
 
+    // 2. Hàm render table, gán class cho từng field và nút Edit
     function renderTable(data) {
       const thead = document.getElementById("thead");
       const tbody = document.getElementById("tbody");
@@ -39,24 +41,28 @@
       if (!data.length) return;
 
       const keys = Object.keys(data[0]);
+      // Header
       const headerRow = document.createElement("tr");
       headerRow.innerHTML =
         `<th class="px-4 py-2">✏️</th>` +
         keys.map(k => `<th class="px-4 py-2 text-left">${k}</th>`).join('');
       thead.appendChild(headerRow);
 
-      data.forEach(item => {
+      // Body
+      data.forEach((item, idx) => {
         const tr = document.createElement("tr");
 
-        // Nút Edit
+        // Edit button
         const tdBtn = document.createElement("td");
         const btn = document.createElement("button");
         btn.textContent = "✏️";
         btn.className = "text-blue-600 hover:underline";
         btn.onclick = () => {
-          // Lưu item vào sessionStorage
-          sessionStorage.setItem('editItem', JSON.stringify(item));
-          // Mở edit.html
+          // Đẩy cả _row để biết update dòng nào
+          sessionStorage.setItem(
+            'editItem',
+            JSON.stringify({ ...item, _row: idx })
+          );
           window.open('edit.html', '_blank');
         };
         tdBtn.appendChild(btn);
@@ -65,7 +71,8 @@
         // Các cột dữ liệu
         keys.forEach(k => {
           const td = document.createElement("td");
-          td.className = "px-4 py-2 border-t";
+          const fieldClass = k.replace(/\s+/g, '');
+          td.className = `px-4 py-2 border-t ${fieldClass}`;
           td.textContent = item[k] ?? '';
           tr.appendChild(td);
         });
@@ -74,7 +81,7 @@
       });
     }
 
-    // Tính năng tìm kiếm
+    // 3. Tìm kiếm
     document.getElementById("searchInput").addEventListener("input", function () {
       const keyword = this.value.toLowerCase();
       const filtered = originalData.filter(item =>
@@ -83,6 +90,30 @@
         )
       );
       renderTable(filtered);
+    });
+
+    // 4. Lắng nghe postMessage từ edit.html
+    window.addEventListener('message', event => {
+      const data = event.data;
+      if (!data || typeof data._row !== 'number') return;
+
+      // Cập nhật vào originalData
+      originalData[data._row] = {
+        ...originalData[data._row],
+        ...data
+      };
+
+      // Re-render bảng (giữ filter nếu cần)
+      renderTable(originalData);
+
+      // Highlight dòng vừa update
+      const rowEl = document
+        .querySelector('#tbody')
+        .rows[data._row];
+      if (rowEl) {
+        rowEl.classList.add('bg-yellow-100');
+        setTimeout(() => rowEl.classList.remove('bg-yellow-100'), 2000);
+      }
     });
   </script>
 </body>
