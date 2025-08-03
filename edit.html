@@ -39,41 +39,35 @@
   </form>
 
   <script>
-    // 1. Lấy dữ liệu từ URL query string
-    const params = new URLSearchParams(window.location.search);
-    const item = {};
-    for (const [key, val] of params.entries()) {
-      item[key] = val;
-    }
+    // 1. Lấy item từ sessionStorage
+    const raw = sessionStorage.getItem('editItem');
+    const item = raw ? JSON.parse(raw) : {};
 
-    // 2. Helper để escape HTML
+    // 2. Helpers
     const escapeHTML = s => String(s || '');
-
-    // 3. Convert dd/mm/yyyy ➔ yyyy-mm-dd
     const formatToInput = str => {
       if (!str || !str.includes('/')) return '';
       const [d, m, y] = str.split('/');
       return `${y}-${m.padStart(2,'0')}-${d.padStart(2,'0')}`;
     };
 
-    // 4. Điền form với dữ liệu
-    document.querySelector('[name="Owner name"]').value       = escapeHTML(item["Owner name"]);
-    document.querySelector('[name="ID"]').value               = escapeHTML(item["ID"]);
-    document.querySelector('[name="Tracking"]').value         = escapeHTML(item["Tracking"]);
-    document.querySelector('[name="Tracking CR"]').value      = escapeHTML(item["Tracking CR"]);
-    document.querySelector('[name="Type"]').value             = item["Type"] || '';
-    document.querySelector('[name="Description"]').value      = escapeHTML(item["Description"]);
-    document.querySelector('[name="Date received"]').value    = formatToInput(item["Date received"]);
-    document.querySelector('[name="Brief case"]').value       = escapeHTML(item["Brief case"]);
-    document.querySelector('[name="Created date"]').value     = formatToInput(item["Created date"]);
-    document.querySelector('[name="Final date"]').value       = formatToInput(item["Final date"]);
+    // 3. Điền form
+    document.querySelector('[name="Owner name"]').value        = escapeHTML(item["Owner name"]);
+    document.querySelector('[name="ID"]').value                = escapeHTML(item["ID"]);
+    document.querySelector('[name="Tracking"]').value          = escapeHTML(item["Tracking"]);
+    document.querySelector('[name="Tracking CR"]').value       = escapeHTML(item["Tracking CR"]);
+    document.querySelector('[name="Type"]').value              = item["Type"] || '';
+    document.querySelector('[name="Description"]').value       = escapeHTML(item["Description"]);
+    document.querySelector('[name="Date received"]').value     = formatToInput(item["Date received"]);
+    document.querySelector('[name="Brief case"]').value        = escapeHTML(item["Brief case"]);
+    document.querySelector('[name="Created date"]').value      = formatToInput(item["Created date"]);
+    document.querySelector('[name="Final date"]').value        = formatToInput(item["Final date"]);
     document.querySelector('[name="Last feedback date"]').value = formatToInput(item["Last feedback date"]);
     document.querySelector('[name="Last checked date"]').value  = formatToInput(item["Last checked date"]);
 
-    // 5. Tính và hiển thị badge aging
+    // 4. Tính và hiển thị badge aging
     const recv = new Date(document.querySelector('[name="Date received"]').value);
-    const days = isNaN(recv) ? 0
-               : Math.floor((new Date() - recv) / (1000*60*60*24));
+    const days = isNaN(recv) ? 0 : Math.floor((new Date() - recv) / (1000*60*60*24));
     const color = days >= 10 ? '#DC2626'
                 : days >= 5  ? '#FACC15'
                 : '#16A34A';
@@ -81,17 +75,16 @@
     badge.textContent = days + ' ngày';
     badge.style.background = color;
 
-    // 6. Bắt sự kiện submit
+    // 5. Submit và trả về index.html
     document.getElementById('editForm').addEventListener('submit', e => {
       e.preventDefault();
       const fm = new FormData(e.target);
-      const updated = { _row: item._row };
+      const updated = { _row: item._row || null };
       for (const [k, v] of fm.entries()) {
         updated[k] = v;
       }
-
-      // gửi về index.html qua postMessage
       window.opener.postMessage(updated, '*');
+      sessionStorage.removeItem('editItem');
       window.close();
     });
   </script>
