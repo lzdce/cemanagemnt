@@ -216,10 +216,7 @@
     }
 
    // Dữ liệu ban đầu kiểu dd/mm/yyyy
-const rawDate = item['Date received']; // ví dụ: "20/05/2025"
-
-// Gán trực tiếp vào input dạng text
-document.getElementById('dateReceived').value = rawDate;
+document.getElementById('dateReceived').value    = item['dateReceived']
 
 // Tách ngày để tính aging
 const [day, month, year] = rawDate.split('/').map(Number);
@@ -335,6 +332,7 @@ document.getElementById('aging').textContent = `${days} ngày`;
   </script>
 </body>
 </html>
+
 
 
 
