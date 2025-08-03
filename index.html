@@ -98,9 +98,12 @@
   `);
 }
     function showDetails(encodedItem) {
-      currentItem = item;
+      const item = JSON.parse(JSON.parse(encodedItem)); // ← decode đúng
+  currentItem = item;
+
   const aging = calculateAging(item["Date received"]);
   const agingColor = getColor(aging);
+
 
 
       const accordion = `
@@ -194,5 +197,6 @@
   </script>
 </body>
 </html>
+
 
 
