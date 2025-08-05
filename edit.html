@@ -141,14 +141,12 @@
   </div>
 
   <script>
-    // Hàm chuẩn hóa mọi loại ngày về dd/mm/yyyy
+    // Hàm chuẩn hóa ngày về dd/mm/yyyy
     function toDisplayDate(s) {
       if (!s) return '';
       if (typeof s === 'string') {
-        // ISO (2025-05-22T17:00:00.000Z) hoặc yyyy-mm-dd
         let m = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
         if (m) return `${m[3]}/${m[2]}/${m[1]}`;
-        // dd/mm/yyyy (đã đúng rồi)
         if (s.match(/^\d{2}\/\d{2}\/\d{4}$/)) return s;
       }
       if (s instanceof Date && !isNaN(s)) {
@@ -158,7 +156,6 @@
       return s;
     }
 
-    // Đổi dd/mm/yyyy về yyyy-mm-dd để tạo new Date
     function toInputDate(s) {
       if (!s) return '';
       if (typeof s === 'string') {
@@ -226,8 +223,8 @@
     document.getElementById('ceStatus').value       = item['CE Status'] || '';
     document.getElementById('reasonDispute').value  = item['Reason dispute'] || '';
     document.getElementById('feedbackCount').value  = item['Feedback count'] || '';
-    document.getElementById('lastFeedback').value  = toDisplayDate(item['Last feedback']);
-    document.getElementById('lastChecked').value   = toDisplayDate(item['Last checked']);
+    document.getElementById('lastFeedback').value   = toDisplayDate(item['Last feedback']);
+    document.getElementById('lastChecked').value    = toDisplayDate(item['Last checked']);
 
     // Lưu orig để kiểm tra thay đổi
     orig['Created date']    = document.getElementById('createdDate').value;
@@ -236,6 +233,24 @@
     orig['Reason dispute']  = document.getElementById('reasonDispute').value;
     orig['Feedback count']  = document.getElementById('feedbackCount').value;
     orig['Last feedback']   = document.getElementById('lastFeedback').value;
+
+    // ===== CE Status cập nhật ngày =====
+    const ceStatusEl = document.getElementById('ceStatus');
+    const createdDateEl = document.getElementById('createdDate');
+    const finalDateEl = document.getElementById('finalDate');
+    ceStatusEl.addEventListener('change', function() {
+      const nowDDMMYYYY = toDisplayDate(new Date());
+      if (this.value === 'Created') {
+        createdDateEl.value = nowDDMMYYYY;
+      }
+      if (
+        this.value === 'Appeal success' ||
+        this.value === 'Appeal reject' ||
+        this.value === 'Do not claim'
+      ) {
+        finalDateEl.value = nowDDMMYYYY;
+      }
+    });
 
     // ===== Checked no feedback =====
     document.getElementById('noFeedbackBtn').addEventListener('click', async () => {
@@ -315,4 +330,3 @@
   </script>
 </body>
 </html>
-
