@@ -286,6 +286,7 @@
 
       if (!allData.length) {
         allData = await fetchAllData();
+        console.log('Fetched:', allData);
       }
       // Lọc theo ID
       foundCases = allData.filter(i => String(i['ID']).trim() === searchId.trim());
