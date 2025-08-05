@@ -214,8 +214,26 @@
     } else vBox.textContent = 'Chưa update';
 
     // Date received & aging
-    const drDisp = toDisplayDate(item['Date received']);
-    document.getElementById('dateReceivedTxt').value = drDisp;
+    function toDisplayDate(s) {
+  if (!s) return '';
+  if (typeof s === 'string') {
+    // ISO dạng 2025-05-22T...
+    let m = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+    if (m) return `${m[3]}/${m[2]}/${m[1]}`;
+    // yyyy-mm-dd
+    m = s.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if (m) return `${m[3]}/${m[2]}/${m[1]}`;
+    // dd/mm/yyyy
+    if (s.match(/^\d{2}\/\d{2}\/\d{4}$/)) return s;
+  }
+  // Nếu là Date object
+  if (s instanceof Date && !isNaN(s)) {
+    return s.toLocaleDateString('vi-VN');
+  }
+  return s;
+}
+    document.getElementById('dateReceivedTxt').value = toDisplayDate(item['Date received']);
+
     const recvDate = new Date(toInputDate(drDisp));
     const days = isNaN(recvDate) ? 0 :
                  Math.floor((Date.now() - recvDate.getTime()) / 86400000);
@@ -313,6 +331,7 @@
   </script>
 </body>
 </html>
+
 
 
 
