@@ -223,12 +223,13 @@
     // yyyy-mm-dd
     m = s.match(/^(\d{4})-(\d{2})-(\d{2})$/);
     if (m) return `${m[3]}/${m[2]}/${m[1]}`;
-    // dd/mm/yyyy
+    // dd/mm/yyyy (đã đúng chuẩn)
     if (s.match(/^\d{2}\/\d{2}\/\d{4}$/)) return s;
   }
-  // Nếu là Date object
+  // Nếu là đối tượng Date
   if (s instanceof Date && !isNaN(s)) {
-    return s.toLocaleDateString('vi-VN');
+    const d = s;
+    return `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
   }
   return s;
 }
@@ -331,6 +332,7 @@
   </script>
 </body>
 </html>
+
 
 
 
