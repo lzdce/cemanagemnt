@@ -63,7 +63,7 @@
             'editItem',
             JSON.stringify({ ...item, _row: idx })
           );
-          window.open('edit.html', '_blank');
+          window.open('edit.html?v=' + Date.now(), '_blank');
         };
         tdBtn.appendChild(btn);
         tr.appendChild(tdBtn);
@@ -118,3 +118,4 @@
   </script>
 </body>
 </html>
+
