@@ -61,7 +61,7 @@
           // Đẩy cả _row để biết update dòng nào
           sessionStorage.setItem(
             'editItem',
-            JSON.stringify({ ...item, _row: idx })
+            JSON.stringify({ ...item})
           );
           window.open('edit.html?v=' + Date.now(), '_blank');
         };
@@ -118,4 +118,5 @@
   </script>
 </body>
 </html>
+
 
