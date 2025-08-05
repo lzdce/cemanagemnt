@@ -325,7 +325,7 @@
   }
   if (!currentCase) { showToast("Không tìm thấy tracking CR", "error"); return; }
   fillForm(currentCase);
-  document.getElementById('formArea').style.display = '';
+  document.getElementById('formArea').classList.remove('hidden');
 }
 
     // ============= BUTTONS LOGIC ==============
