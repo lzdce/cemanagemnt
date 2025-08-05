@@ -4,17 +4,11 @@
 <head>
   <meta charset="UTF-8" />
   <title>CE edit form</title>
-
-  <!-- Force fresh copy on GitHub Pages & browser -->
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma"        content="no-cache" />
   <meta http-equiv="Expires"       content="0" />
-
   <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    /* Giữ header + nút luôn hiển thị */
-    #stickyBar { position: sticky; top: 0; z-index: 50; }
-  </style>
+  <style>#stickyBar { position: sticky; top: 0; z-index: 50; }</style>
 </head>
 <body class="bg-gray-100">
   <!-- STICKY BAR -->
@@ -149,42 +143,52 @@
   </div>
 
   <script>
-    /***** Helpers *****/
-  const toInputDate = s => {
-  if (!s) return '';
-  if (typeof s === 'string') {
-    // Nếu là ISO date dạng 2025-05-22T17:00:00.000Z
-    if (s.match(/^\d{4}-\d{2}-\d{2}T/)) {
-      // Cắt lấy phần yyyy-mm-dd
-      return s.slice(0,10);
+    // ==== Helper: Đổi ngày về yyyy-mm-dd cho input type=date ====
+    function toInputDate(s) {
+      if (!s) return '';
+      if (typeof s === 'string') {
+        // Nếu là ISO date dạng 2025-05-22T17:00:00.000Z
+        let m = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+        if (m) return `${m[1]}-${m[2]}-${m[3]}`;
+        // Nếu chuỗi có "/", giả sử DD/MM/YYYY
+        if (s.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
+          const [d,m,y] = s.split('/');
+          return `${y}-${m.padStart(2,'0')}-${d.padStart(2,'0')}`;
+        }
+        // Nếu đã là yyyy-mm-dd
+        if (s.match(/^\d{4}-\d{2}-\d{2}$/)) {
+          return s;
+        }
+      }
+      // Nếu là Date object
+      if (s instanceof Date && !isNaN(s)) {
+        return s.toISOString().slice(0,10);
+      }
+      return '';
     }
-    // Nếu chuỗi có "/", giả sử DD/MM/YYYY
-    if (s.includes('/')) {
-      const [d,m,y] = s.split('/');
-      return `${y}-${m.padStart(2,'0')}-${d.padStart(2,'0')}`;
-    }
-    // Nếu đã là yyyy-mm-dd
-    if (s.match(/^\d{4}-\d{2}-\d{2}$/)) {
+
+    // ==== Helper: Đổi ngày về dd/mm/yyyy để hiển thị ====
+    function toDisplayDate(s) {
+      if (!s) return '';
+      if (typeof s === 'string') {
+        // ISO dạng 2025-05-22T...
+        let m = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+        if (m) return `${m[3]}/${m[2]}/${m[1]}`;
+        // yyyy-mm-dd
+        m = s.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+        if (m) return `${m[3]}/${m[2]}/${m[1]}`;
+        // dd/mm/yyyy (đã đúng chuẩn)
+        if (s.match(/^\d{2}\/\d{2}\/\d{4}$/)) return s;
+      }
+      // Nếu là đối tượng Date
+      if (s instanceof Date && !isNaN(s)) {
+        const d = s;
+        return `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
+      }
       return s;
     }
-  }
-  // Nếu là Date object
-  if (s instanceof Date && !isNaN(s)) {
-    return s.toISOString().slice(0,10);
-  }
-  return '';
-};
-    const toDisplayDate = s => {
-      if (!s) return '';
-      // nếu đã yyyy-mm-dd, chuyển ngược lại
-      if (s.includes('-')) {
-        const [y,m,d] = s.split('-');
-        return `${d.padStart(2,'0')}/${m.padStart(2,'0')}/${y}`;
-      }
-      return s; // đã DD/MM/YYYY
-    };
 
-    /***** Load item từ sessionStorage *****/
+    // ==== Load item từ sessionStorage ====
     const raw   = sessionStorage.getItem('editItem');
     if (!raw) { alert('Không tìm thấy dữ liệu'); window.close(); }
     const item  = JSON.parse(raw);
@@ -214,30 +218,11 @@
     } else vBox.textContent = 'Chưa update';
 
     // Date received & aging
-    function toDisplayDate(s) {
-  if (!s) return '';
-  if (typeof s === 'string') {
-    // ISO dạng 2025-05-22T...
-    let m = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
-    if (m) return `${m[3]}/${m[2]}/${m[1]}`;
-    // yyyy-mm-dd
-    m = s.match(/^(\d{4})-(\d{2})-(\d{2})$/);
-    if (m) return `${m[3]}/${m[2]}/${m[1]}`;
-    // dd/mm/yyyy (đã đúng chuẩn)
-    if (s.match(/^\d{2}\/\d{2}\/\d{4}$/)) return s;
-  }
-  // Nếu là đối tượng Date
-  if (s instanceof Date && !isNaN(s)) {
-    const d = s;
-    return `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
-  }
-  return s;
-}
     document.getElementById('dateReceivedTxt').value = toDisplayDate(item['Date received']);
-
-    const recvDate = new Date(toInputDate(drDisp));
+    // Tính số ngày backlog
+    const recvDate = new Date(toInputDate(item['Date received']));
     const days = isNaN(recvDate) ? 0 :
-                 Math.floor((Date.now() - recvDate.getTime()) / 86400000);
+      Math.floor((Date.now() - recvDate.getTime()) / 86400000);
     document.getElementById('agingBadge').textContent = `${days} ngày`;
 
     // --- Fill Status ---
@@ -248,94 +233,73 @@
     set('ceStatus',         item['CE Status']);
     set('reasonDispute',    item['Reason dispute']);
     set('feedbackCount',    item['Feedback count']);
-    set('lastFeedback', toInputDate(item['Last feedback']));
-    set('lastChecked',  toInputDate(item['Last checked']));
+    set('lastFeedback',     toInputDate(item['Last feedback']));
+    set('lastChecked',      toInputDate(item['Last checked']));
 
-    // Lưu orig
+    // Lưu orig để kiểm tra thay đổi
     ['Created date','Final date','CE Status',
      'Reason dispute','Feedback count','Last checked'
     ].forEach(k => orig[k] = item[k] || '');
 
-    /***** Checked no feedback *****/
+    // ===== Checked no feedback =====
     document.getElementById('noFeedbackBtn').addEventListener('click', async () => {
-  const curr = {
-    'Created date':      document.getElementById('createdDate').value,
-    'Final date':        document.getElementById('finalDate').value,
-    'CE Status':         document.getElementById('ceStatus').value,
-    'Reason dispute':    document.getElementById('reasonDispute').value,
-    'Feedback count':    document.getElementById('feedbackCount').value,
-    'Last checked date': document.getElementById('lastChecked').value
-  };
+      const curr = {
+        'Created date':      document.getElementById('createdDate').value,
+        'Final date':        document.getElementById('finalDate').value,
+        'CE Status':         document.getElementById('ceStatus').value,
+        'Reason dispute':    document.getElementById('reasonDispute').value,
+        'Feedback count':    document.getElementById('feedbackCount').value,
+        'Last checked date': document.getElementById('lastChecked').value
+      };
+      const isChanged = Object.keys(curr).some(k => toDisplayDate(curr[k]) !== orig[k]);
+      const today = new Date().toISOString().slice(0,10);
+      const payload = { ...item };
+      payload['Last checked'] = today;
+      if (!isChanged) {
+        payload['Date received'] = today;
+      } else {
+        const ok = confirm('Bạn đã change data, bạn có muốn bỏ qua data đã change và chỉ cập nhật Last checked không?');
+        if (!ok) return;
+      }
+      await pushToSheet(payload);
+      window.opener.postMessage(payload, '*');
+      sessionStorage.removeItem('editItem');
+      window.close();
+    });
 
-  const isChanged = Object.keys(curr).some(k => toDisplayDate(curr[k]) !== orig[k]);
-  const today = new Date().toISOString().slice(0,10);
-  const payload = { ...item };  // sao chép toàn bộ item gốc
-
-  payload['Last checked'] = today;
-
-  if (!isChanged) {
-    // Nếu không có gì thay đổi, ta sẽ gán thêm Date received = today
-    payload['Date received'] = today;
-  } else {
-    const ok = confirm('Bạn đã change data, bạn có muốn bỏ qua data đã change và chỉ cập nhật Last checked không?');
-    if (!ok) return;
-  }
-
-  await pushToSheet(payload);
-  window.opener.postMessage(payload, '*');
-  sessionStorage.removeItem('editItem');
-  window.close();
-});
-
-
-    /***** SAVE *****/
+    // ===== SAVE =====
     document.getElementById('saveBtn').addEventListener('click', async () => {
-  const payload = { ...item };  // sao chép toàn bộ dữ liệu gốc
+      const payload = { ...item };
+      payload['Created date']     = toDisplayDate(document.getElementById('createdDate').value);
+      payload['Final date']       = toDisplayDate(document.getElementById('finalDate').value);
+      payload['CE Status']        = document.getElementById('ceStatus').value;
+      payload['Reason dispute']   = document.getElementById('reasonDispute').value;
+      payload['Feedback count']   = document.getElementById('feedbackCount').value;
+      payload['Last feedback']    = toDisplayDate(document.getElementById('lastFeedback').value);
+      payload['Last checked']     = toDisplayDate(document.getElementById('lastChecked').value);
+      await pushToSheet(payload);
+      window.opener.postMessage(payload, '*');
+      sessionStorage.removeItem('editItem');
+      window.close();
+    });
 
-  // Cập nhật lại các field có thể chỉnh sửa
-  payload['Created date']       = toDisplayDate(document.getElementById('createdDate').value);
-  payload['Final date']         = toDisplayDate(document.getElementById('finalDate').value);
-  payload['CE Status']          = document.getElementById('ceStatus').value;
-  payload['Reason dispute']     = document.getElementById('reasonDispute').value;
-  payload['Feedback count']     = document.getElementById('feedbackCount').value;
-  payload['Last feedback'] = toDisplayDate(document.getElementById('lastFeedback').value);
-  payload['Last checked']  = toDisplayDate(document.getElementById('lastChecked').value);
-
-  await pushToSheet(payload);
-  window.opener.postMessage(payload, '*');
-  sessionStorage.removeItem('editItem');
-  window.close();
-});
-
-
-    /***** Gửi cập nhật đến Cloudflare Worker *****/
+    // ===== Push cập nhật lên server =====
     async function pushToSheet(obj) {
-  // Kiểm tra giá trị _row trước khi gửi
-  if (!obj._row || obj._row === 0) {
-    alert('Dữ liệu không chứa giá trị _row hợp lệ!');
-    return;
-  }
-
-  // Gửi request cập nhật tới Cloudflare Worker
-  const res = await fetch('https://lzdcemanagement.phuonghoangcao1703.workers.dev/update', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(obj)
-  });
-
-  if (!res.ok) {
-    const t = await res.text();
-    alert('Không thể cập nhật Google Sheet: ' + t);
-    throw new Error(t);
-  }
-}
+      if (!obj._row || obj._row === 0) {
+        alert('Dữ liệu không chứa giá trị _row hợp lệ!');
+        return;
+      }
+      const res = await fetch('https://lzdcemanagement.phuonghoangcao1703.workers.dev/update', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(obj)
+      });
+      if (!res.ok) {
+        const t = await res.text();
+        alert('Không thể cập nhật Google Sheet: ' + t);
+        throw new Error(t);
+      }
+    }
   </script>
 </body>
 </html>
-
-
-
-
-
-
-
