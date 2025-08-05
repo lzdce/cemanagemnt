@@ -14,6 +14,10 @@
   <div id="stickyBar" class="flex items-center justify-between bg-blue-600 p-4">
     <h1 class="text-lg font-semibold text-white">CE edit form</h1>
     <div class="space-x-2">
+      <button id="addFeedbackBtn"
+              class="px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded">
+        Thêm feedback
+      </button>
       <button id="noFeedbackBtn"
               class="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded">
         Checked no feedback
@@ -251,6 +255,46 @@
         finalDateEl.value = nowDDMMYYYY;
       }
     });
+
+    // ======= THÊM FEEDBACK =======
+    document.getElementById('addFeedbackBtn').addEventListener('click', async () => {
+      const ceStatusEl = document.getElementById('ceStatus');
+      const feedbackCountEl = document.getElementById('feedbackCount');
+      const lastFeedbackEl = document.getElementById('lastFeedback');
+      let ceStatus = ceStatusEl.value;
+      let feedbackCount = parseInt(feedbackCountEl.value) || 0;
+
+      // Chỉ chấp nhận khi status là Created hoặc Being process
+      if (ceStatus !== 'Created' && ceStatus !== 'Being process') {
+        alert('Không hợp lệ, case chưa có status hoặc đang đóng!');
+        return;
+      }
+
+      const todayDisplay = toDisplayDate(new Date());
+
+      if (ceStatus === 'Created') {
+        ceStatus = 'Being process';
+        ceStatusEl.value = ceStatus;
+        feedbackCount = 2;
+      } else if (ceStatus === 'Being process') {
+        feedbackCount += 1;
+      }
+
+      feedbackCountEl.value = feedbackCount;
+      lastFeedbackEl.value = todayDisplay;
+
+      // Tự động lưu lên server luôn:
+      const payload = { ...item };
+      payload['CE Status'] = ceStatus;
+      payload['Feedback count'] = feedbackCount;
+      payload['Last feedback'] = todayDisplay;
+
+      await pushToSheet(payload);
+      window.opener.postMessage(payload, '*');
+      sessionStorage.removeItem('editItem');
+      window.close();
+    });
+
 
     // ===== Checked no feedback =====
     document.getElementById('noFeedbackBtn').addEventListener('click', async () => {
