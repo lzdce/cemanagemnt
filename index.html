@@ -317,11 +317,16 @@
       }
     }
     function selectCurrentCase(trackingCR){
-      currentCase = foundCases.find(i => i['Tracking CR'] === trackingCR);
-      if (!currentCase) { showToast("Không tìm thấy tracking CR", "error"); return; }
-      fillForm(currentCase);
-      document.getElementById('formArea').style.display = '';
-    }
+  // Nếu trackingCR undefined => lấy dòng đầu tiên của foundCases
+  if (typeof trackingCR === 'undefined') {
+    currentCase = foundCases[0];
+  } else {
+    currentCase = foundCases.find(i => (i['Tracking CR'] || "") === trackingCR);
+  }
+  if (!currentCase) { showToast("Không tìm thấy tracking CR", "error"); return; }
+  fillForm(currentCase);
+  document.getElementById('formArea').style.display = '';
+}
 
     // ============= BUTTONS LOGIC ==============
     // Cập nhật created date khi status đổi thành Created
