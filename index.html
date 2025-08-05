@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <title>CE EDIT FORM</title>
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma"        content="no-cache" />
+  <meta http-equiv="Expires"       content="0" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    #stickyBar { position: sticky; top: 0; z-index: 50; }
+    .toast { position:fixed;top:1rem;right:1rem;z-index:9999;padding:.75rem 2rem;border-radius:.5rem;font-weight:bold;background:#22c55e;color:#fff;display:none;}
+    .toast.error {background:#ef4444;}
+  </style>
+</head>
+<body class="bg-gray-100">
+  <div id="stickyBar" class="flex flex-col md:flex-row items-center justify-between bg-blue-700 p-4 mb-4">
+    <h1 class="text-2xl font-bold text-white tracking-wide">CE EDIT FORM</h1>
+    <div class="flex flex-col md:flex-row items-center gap-4 mt-4 md:mt-0">
+      <input id="searchId" placeholder="Nhập ID đơn hàng..." class="px-4 py-2 border rounded bg-white" />
+      <div id="trackingCRBox">
+        <input id="searchTrackingCR" placeholder="Nhập Tracking CR..." class="px-4 py-2 border rounded bg-white" />
+      </div>
+      <button id="btnFind" class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded">Tìm</button>
+    </div>
+  </div>
+
+  <div id="formArea" class="max-w-3xl mx-auto p-4 space-y-8 hidden">
+    <!-- BUTTONS -->
+    <div class="flex justify-end gap-2">
+      <button id="addFeedbackBtn" class="px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded">Thêm feedback</button>
+      <button id="noFeedbackBtn" class="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded">Checked no feedback</button>
+      <button id="saveBtn" class="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded">Save</button>
+    </div>
+    <!-- INFORMATION -->
+    <section class="bg-white rounded shadow p-4">
+      <h2 class="font-semibold text-gray-700 mb-2">Information</h2>
+      <div class="grid grid-cols-3 gap-4 text-sm">
+        <!-- Row 1 -->
+        <div>
+          <label class="block font-semibold">Owner</label>
+          <input id="ownerName" class="w-full bg-gray-100 rounded p-2" readonly />
+        </div>
+        <div>
+          <label class="block font-semibold">Type</label>
+          <input id="typeField" class="w-full bg-gray-100 rounded p-2" readonly />
+        </div>
+        <div></div>
+        <!-- Row 2 -->
+        <div>
+          <label class="block font-semibold">ID</label>
+          <input id="idField" class="w-full bg-gray-100 rounded p-2" readonly />
+        </div>
+        <div>
+          <label class="block font-semibold">Tracking</label>
+          <input id="tracking" class="w-full bg-gray-100 rounded p-2" readonly />
+        </div>
+        <div>
+          <label class="block font-semibold">Tracking CR</label>
+          <input id="trackingCR" class="w-full bg-gray-100 rounded p-2" readonly />
+        </div>
+        <!-- Row 3 -->
+        <div>
+          <label class="block font-semibold">Date received</label>
+          <input id="dateReceived" class="w-full bg-gray-100 rounded p-2" readonly />
+        </div>
+        <div>
+          <label class="block font-semibold">Resolution time (ngày)</label>
+          <input id="resolutionTime" class="w-full bg-gray-100 rounded p-2" readonly />
+        </div>
+        <div>
+          <label class="block font-semibold">Aging backlog (ngày)</label>
+          <input id="agingBacklog" class="w-full bg-gray-100 rounded p-2" readonly />
+        </div>
+        <!-- Row 4 -->
+        <div>
+          <label class="block font-semibold">Video OB</label>
+          <button id="videoOBBtn" class="underline text-blue-600" style="display:none">Link OB</button>
+          <span id="videoOBNA" class="text-gray-400">Chưa update</span>
+        </div>
+        <div></div>
+        <div></div>
+        <!-- Row 5 -->
+        <div class="col-span-2">
+          <label class="block font-semibold">Description</label>
+          <textarea id="description" rows="2" class="w-full bg-gray-100 rounded p-2" readonly></textarea>
+        </div>
+        <div>
+          <label class="block font-semibold">Brief case</label>
+          <input id="briefCase" class="w-full bg-gray-100 rounded p-2" readonly />
+        </div>
+      </div>
+    </section>
+    <!-- STATUS -->
+    <section class="bg-white rounded shadow p-4">
+      <h2 class="font-semibold text-gray-700 mb-2">Status</h2>
+      <div class="grid grid-cols-5 gap-4 text-sm mb-2">
+        <div>
+          <label class="block font-semibold">Created</label>
+          <input id="createdDate" class="w-full border rounded p-2" readonly />
+        </div>
+        <div>
+          <label class="block font-semibold">Final</label>
+          <input id="finalDate" class="w-full border rounded p-2" readonly />
+        </div>
+        <div>
+          <label class="block font-semibold">Last feedback</label>
+          <input id="lastFeedback" class="w-full border rounded p-2" readonly />
+        </div>
+        <div>
+          <label class="block font-semibold">Last checked</label>
+          <input id="lastChecked" class="w-full border rounded p-2" readonly />
+        </div>
+        <div></div>
+      </div>
+      <div class="grid grid-cols-3 gap-4 text-sm">
+        <div>
+          <label class="block font-semibold">CE Status</label>
+          <select id="ceStatus" class="w-full border rounded p-2">
+            <option value="">— Chọn trạng thái —</option>
+            <option>Created</option>
+            <option>Being process</option>
+            <option>Appeal success</option>
+            <option>Appeal reject</option>
+            <option>Do not claim</option>
+            <option>Need to follow</option>
+            <option>Closed</option>
+          </select>
+        </div>
+        <div>
+          <label class="block font-semibold">Times</label>
+          <input type="number" id="feedbackCount" min="0" class="w-full border rounded p-2" />
+        </div>
+        <div>
+          <label class="block font-semibold">Reason dispute</label>
+          <textarea id="reasonDispute" rows="2" class="w-full border rounded p-2"></textarea>
+        </div>
+      </div>
+    </section>
+  </div>
+  <div class="toast" id="toastMessage"></div>
+
+  <script>
+    // =================== CONFIG ========================
+    const DATA_URL = 'https://lzdcemanagement.phuonghoangcao1703.workers.dev/';
+
+    // ==== Utilities
+    function toDisplayDate(s) {
+      if (!s) return '';
+      if (typeof s === 'string') {
+        let m = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+        if (m) return `${m[3]}/${m[2]}/${m[1]}`;
+        if (s.match(/^\d{2}\/\d{2}\/\d{4}$/)) return s;
+      }
+      if (s instanceof Date && !isNaN(s)) {
+        const d = s;
+        return `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
+      }
+      return s;
+    }
+    function toInputDate(s) {
+      if (!s) return '';
+      if (typeof s === 'string') {
+        let m = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+        if (m) return `${m[1]}-${m[2]}-${m[3]}`;
+        if (s.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
+          const [d, mth, y] = s.split('/');
+          return `${y}-${mth.padStart(2,'0')}-${d.padStart(2,'0')}`;
+        }
+      }
+      if (s instanceof Date && !isNaN(s)) return s.toISOString().slice(0,10);
+      return '';
+    }
+    function diffDays(date1, date2) {
+      const d1 = toInputDate(date1), d2 = toInputDate(date2);
+      if (!d1 || !d2) return 0;
+      const t1 = new Date(d1), t2 = new Date(d2);
+      t1.setHours(0,0,0,0); t2.setHours(0,0,0,0);
+      return Math.max(0, Math.floor((t2-t1)/86400000));
+    }
+    function showToast(msg, type="success") {
+      const toast = document.getElementById('toastMessage');
+      toast.textContent = msg;
+      toast.className = "toast" + (type==="error"?" error":"");
+      toast.style.display = 'block';
+      setTimeout(()=>{ toast.style.display='none'; }, 2000);
+    }
+
+    // =================== DATA HANDLING ========================
+    let allData = [];
+    let foundCases = [];
+    let currentCase = null, orig = {};
+
+    async function fetchAllData() {
+      const res = await fetch(DATA_URL);
+      return await res.json();
+    }
+
+    function showTrackingCRDropDown(trackingList) {
+      const box = document.getElementById('trackingCRBox');
+      box.innerHTML = `
+        <select id="searchTrackingCR" class="px-4 py-2 border rounded bg-white">
+          <option value="">Chọn Tracking CR...</option>
+          ${trackingList.map(cr => `<option value="${cr}">${cr}</option>`).join('')}
+        </select>
+      `;
+    }
+    function showTrackingCRInput() {
+      const box = document.getElementById('trackingCRBox');
+      box.innerHTML = `
+        <input id="searchTrackingCR" placeholder="Nhập Tracking CR..." class="px-4 py-2 border rounded bg-white" />
+      `;
+    }
+
+    function fillForm(item) {
+      // Section 1: Info
+      document.getElementById('ownerName').value = item['Owner name'] || '';
+      document.getElementById('typeField').value = item['Type'] || '';
+      document.getElementById('idField').value = item['ID'] || '';
+      document.getElementById('tracking').value = item['Tracking'] || '';
+      document.getElementById('trackingCR').value = item['Tracking CR'] || '';
+      document.getElementById('dateReceived').value = toDisplayDate(item['Date received']);
+      document.getElementById('description').value = item['Description'] || '';
+      document.getElementById('briefCase').value = item['Brief case'] || '';
+
+      // Video OB
+      if(item['Video OB']){
+        document.getElementById('videoOBBtn').style.display = '';
+        document.getElementById('videoOBNA').style.display = 'none';
+        document.getElementById('videoOBBtn').onclick = ()=>{
+          navigator.clipboard.writeText(item['Video OB']);
+          showToast("Đã copy link video OB");
+        };
+      } else {
+        document.getElementById('videoOBBtn').style.display = 'none';
+        document.getElementById('videoOBNA').style.display = '';
+      }
+
+      // Resolution time
+      let created = item['Created date'], final = item['Final date'], todayStr = toDisplayDate(new Date());
+      let reso = 0;
+      if (created) {
+        if (final) reso = diffDays(created, final);
+        else reso = diffDays(created, todayStr);
+      }
+      document.getElementById('resolutionTime').value = reso;
+
+      // Aging backlog: dateReceived -> created (hoặc today nếu chưa có created)
+      let aging = 0;
+      if (item['Date received']) {
+        if (created) aging = diffDays(item['Date received'], created);
+        else aging = diffDays(item['Date received'], todayStr);
+      }
+      document.getElementById('agingBacklog').value = aging;
+
+      // Section 2: Status
+      document.getElementById('createdDate').value = toDisplayDate(item['Created date']);
+      document.getElementById('finalDate').value = toDisplayDate(item['Final date']);
+      document.getElementById('lastFeedback').value = toDisplayDate(item['Last feedback']);
+      document.getElementById('lastChecked').value = toDisplayDate(item['Last checked']);
+      document.getElementById('ceStatus').value = item['CE Status'] || '';
+      document.getElementById('feedbackCount').value = item['Feedback count'] || '';
+      document.getElementById('reasonDispute').value = item['Reason dispute'] || '';
+
+      // Lưu bản gốc cho kiểm tra thay đổi
+      orig = {
+        'Created date': document.getElementById('createdDate').value,
+        'Final date': document.getElementById('finalDate').value,
+        'CE Status': document.getElementById('ceStatus').value,
+        'Reason dispute': document.getElementById('reasonDispute').value,
+        'Feedback count': document.getElementById('feedbackCount').value,
+        'Last feedback': document.getElementById('lastFeedback').value,
+        'Last checked': document.getElementById('lastChecked').value
+      };
+    }
+
+    // ================== SEARCH ====================
+    document.getElementById('btnFind').addEventListener('click', onFindCase);
+
+    async function onFindCase() {
+      const searchId = document.getElementById('searchId').value.trim();
+      const trackingCR = document.getElementById('searchTrackingCR').value.trim();
+
+      if (!searchId) { showToast("Vui lòng nhập ID", "error"); return; }
+
+      if (!allData.length) {
+        allData = await fetchAllData();
+      }
+      // Lọc theo ID
+      foundCases = allData.filter(i => (i['ID']+'').toLowerCase() === searchId.toLowerCase());
+      if (!foundCases.length) {
+        showToast("Không tìm thấy ID này", "error"); return;
+      }
+
+      // Tracking CR
+      let trackingCRList = [...new Set(foundCases.map(i => i['Tracking CR']).filter(Boolean))];
+      if (trackingCRList.length > 1) {
+        showTrackingCRDropDown(trackingCRList);
+        document.getElementById('searchTrackingCR').addEventListener('change', function(){
+          if(this.value) selectCurrentCase(this.value);
+        });
+        showToast("Chọn Tracking CR", "error");
+        return;
+      } else {
+        showTrackingCRInput();
+      }
+
+      // Chỉ 1: tự động fill
+      if (foundCases.length === 1) {
+        selectCurrentCase(foundCases[0]['Tracking CR']);
+      } else if (foundCases.length > 1 && trackingCRList.length === 1) {
+        selectCurrentCase(trackingCRList[0]);
+      } else {
+        showToast("Vui lòng nhập hoặc chọn Tracking CR", "error");
+      }
+    }
+    function selectCurrentCase(trackingCR){
+      currentCase = foundCases.find(i => i['Tracking CR'] === trackingCR);
+      if (!currentCase) { showToast("Không tìm thấy tracking CR", "error"); return; }
+      fillForm(currentCase);
+      document.getElementById('formArea').style.display = '';
+    }
+
+    // ============= BUTTONS LOGIC ==============
+    // Cập nhật created date khi status đổi thành Created
+    document.getElementById('ceStatus').addEventListener('change', function() {
+      const nowDDMMYYYY = toDisplayDate(new Date());
+      if (this.value === 'Created') {
+        document.getElementById('createdDate').value = nowDDMMYYYY;
+      }
+    });
+
+    document.getElementById('addFeedbackBtn').addEventListener('click', async () => {
+      if (!currentCase) return;
+      const ceStatusEl = document.getElementById('ceStatus');
+      const feedbackCountEl = document.getElementById('feedbackCount');
+      const lastFeedbackEl = document.getElementById('lastFeedback');
+      let ceStatus = ceStatusEl.value;
+      let feedbackCount = parseInt(feedbackCountEl.value) || 0;
+
+      if (ceStatus !== 'Created' && ceStatus !== 'Being process') {
+        showToast('Không hợp lệ, case chưa có status hoặc đang đóng!', "error");
+        return;
+      }
+      const todayDisplay = toDisplayDate(new Date());
+      if (ceStatus === 'Created') {
+        ceStatus = 'Being process';
+        ceStatusEl.value = ceStatus;
+        feedbackCount = 2;
+      } else if (ceStatus === 'Being process') {
+        feedbackCount += 1;
+      }
+      feedbackCountEl.value = feedbackCount;
+      lastFeedbackEl.value = todayDisplay;
+      await saveToSheet('addFeedback');
+    });
+
+    document.getElementById('noFeedbackBtn').addEventListener('click', async () => {
+      if (!currentCase) return;
+      const ceStatus = document.getElementById('ceStatus').value;
+      if (ceStatus !== 'Created' && ceStatus !== 'Being process') {
+        showToast("Không thể cập nhật checked vì case chưa tạo hoặc đang đóng", "error");
+        return;
+      }
+      const curr = {
+        'Created date':     document.getElementById('createdDate').value,
+        'Final date':       document.getElementById('finalDate').value,
+        'CE Status':        document.getElementById('ceStatus').value,
+        'Reason dispute':   document.getElementById('reasonDispute').value,
+        'Feedback count':   document.getElementById('feedbackCount').value,
+        'Last feedback':    document.getElementById('lastFeedback').value
+      };
+      const isChanged = Object.keys(curr).some(k => curr[k] !== orig[k]);
+      if (isChanged) {
+        if (confirm('Bạn đã change data, nếu bạn đồng ý bỏ data đã change chỉ update ngày last checked thì hãy nhấn đồng ý')) {
+          const today = new Date().toISOString().slice(0,10);
+          document.getElementById('lastChecked').value = toDisplayDate(today);
+          await saveToSheet('noFeedback');
+          return;
+        } else {
+          return;
+        }
+      } else {
+        const today = new Date().toISOString().slice(0,10);
+        document.getElementById('lastChecked').value = toDisplayDate(today);
+        document.getElementById('dateReceived').value = toDisplayDate(today);
+        await saveToSheet('noFeedback');
+      }
+    });
+
+    document.getElementById('saveBtn').addEventListener('click', async () => {
+      if (!currentCase) return;
+      // So sánh các trường để kiểm tra thay đổi
+      const ceStatus = document.getElementById('ceStatus').value;
+      const reasonDispute = document.getElementById('reasonDispute').value.trim();
+      const finalDateEl = document.getElementById('finalDate');
+      const createdDate = document.getElementById('createdDate').value.trim();
+      const nowDDMMYYYY = toDisplayDate(new Date());
+      const curr = {
+        'Created date':     document.getElementById('createdDate').value,
+        'Final date':       document.getElementById('finalDate').value,
+        'CE Status':        ceStatus,
+        'Reason dispute':   reasonDispute,
+        'Feedback count':   document.getElementById('feedbackCount').value,
+        'Last feedback':    document.getElementById('lastFeedback').value
+      };
+      const isChanged = Object.keys(curr).some(k => curr[k] !== orig[k]);
+      if (!isChanged) {
+        showToast("Bạn chưa thay đổi", "error");
+        return;
+      }
+      if (
+        (ceStatus === 'Appeal reject' || ceStatus === 'Appeal success') &&
+        createdDate === ""
+      ) {
+        showToast("Case chưa được tạo, bạn đang cập nhật sai trạng thái", "error");
+        document.getElementById('ceStatus').focus();
+        return;
+      }
+      if (
+        ceStatus === 'Appeal success' ||
+        ceStatus === 'Appeal reject' ||
+        ceStatus === 'Do not claim'
+      ) {
+        finalDateEl.value = nowDDMMYYYY;
+      }
+      if (
+        (ceStatus === "Appeal reject" || ceStatus === "Do not claim") &&
+        reasonDispute === ""
+      ) {
+        showToast("Cập nhật reason dispute", "error");
+        document.getElementById('reasonDispute').focus();
+        return;
+      }
+      await saveToSheet('saveBtn');
+    });
+
+    async function saveToSheet(actionType='saveBtn') {
+      // Chuẩn bị payload
+      const payload = { ...currentCase };
+      payload['Created date']     = document.getElementById('createdDate').value;
+      payload['Final date']       = document.getElementById('finalDate').value;
+      payload['CE Status']        = document.getElementById('ceStatus').value;
+      payload['Reason dispute']   = document.getElementById('reasonDispute').value.trim();
+      payload['Feedback count']   = document.getElementById('feedbackCount').value;
+      payload['Last feedback']    = toDisplayDate(document.getElementById('lastFeedback').value);
+      payload['Last checked']     = toDisplayDate(document.getElementById('lastChecked').value);
+
+      try {
+        const res = await fetch(DATA_URL + 'update', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        if (res.ok) {
+          showToast("Cập nhật thành công", "success");
+          // reload lại case để lấy giá trị mới nhất
+          setTimeout(()=>{ location.reload(); }, 1200);
+        } else {
+          showToast("Lỗi, chưa cập nhật", "error");
+        }
+      } catch (e) {
+        showToast("Lỗi, chưa cập nhật", "error");
+      }
+    }
+  </script>
+</body>
+</html>
