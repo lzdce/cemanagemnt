@@ -128,12 +128,12 @@
 
         <div>
           <label class="block">Last feedback </label>
-          <input type="date" id="lastFeedback" class="w-full border rounded p-2" />
+          <input id="lastFeedback" class="w-full border rounded p-2" readonly />
         </div>
 
         <div>
           <label class="block">Last checked</label>
-          <input type="date" id="lastChecked" class="w-full border rounded p-2" readonly />
+          <input id="lastChecked" class="w-full border rounded p-2" readonly />
         </div>
 
       </div>
@@ -226,8 +226,8 @@
     document.getElementById('ceStatus').value       = item['CE Status'] || '';
     document.getElementById('reasonDispute').value  = item['Reason dispute'] || '';
     document.getElementById('feedbackCount').value  = item['Feedback count'] || '';
-    document.getElementById('lastFeedback').value   = toInputDate(item['Last feedback']);
-    document.getElementById('lastChecked').value    = toInputDate(item['Last checked']);
+    document.getElementById('lastFeedback').value  = toDisplayDate(item['Last feedback']);
+    document.getElementById('lastChecked').value   = toDisplayDate(item['Last checked']);
 
     // Lưu orig để kiểm tra thay đổi
     orig['Created date']    = document.getElementById('createdDate').value;
@@ -315,3 +315,4 @@
   </script>
 </body>
 </html>
+
