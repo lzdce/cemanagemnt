@@ -405,20 +405,7 @@
   window.close();
 });
     
-      const payload = { ...item };
-      payload['Created date']     = document.getElementById('createdDate').value;
-      payload['Final date']       = document.getElementById('finalDate').value;
-      payload['CE Status']        = ceStatus;
-      payload['Reason dispute']   = reasonDispute;
-      payload['Feedback count']   = document.getElementById('feedbackCount').value;
-      payload['Last feedback']    = toDisplayDate(document.getElementById('lastFeedback').value);
-      payload['Last checked']     = toDisplayDate(document.getElementById('lastChecked').value);
     
-      await pushToSheet(payload);
-      window.opener.postMessage(payload, '*');
-      sessionStorage.removeItem('editItem');
-      window.close();
-    });
     // ===== Push cập nhật lên server =====
     async function pushToSheet(obj) {
       if (!obj._row || obj._row === 0) {
@@ -439,6 +426,7 @@
   </script>
 </body>
 </html>
+
 
 
 
