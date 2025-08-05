@@ -1,4 +1,4 @@
-<!-- ✨ CE edit form – 2025-08-03 -->
+<!-- ✨ CE edit form – Date received readonly, Aging tính tự động -->
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -71,9 +71,8 @@
         </div>
 
         <div>
-          <label class="block">Date received (dd/mm/yyyy)</label>
-          <input id="dateReceivedTxt"
-                 class="w-full bg-gray-200 rounded p-2" readonly />
+          <label class="block">Date received (yyyy-mm-dd)</label>
+          <input type="date" id="dateReceivedTxt" class="w-full bg-gray-200 rounded p-2" readonly />
         </div>
 
         <div>
@@ -143,49 +142,19 @@
   </div>
 
   <script>
-    // ==== Helper: Đổi ngày về yyyy-mm-dd cho input type=date ====
+    // Đổi mọi kiểu ngày về yyyy-mm-dd cho input type="date"
     function toInputDate(s) {
       if (!s) return '';
       if (typeof s === 'string') {
-        // Nếu là ISO date dạng 2025-05-22T17:00:00.000Z
-        let m = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+        let m = s.match(/^(\d{4})-(\d{2})-(\d{2})/); // ISO or yyyy-mm-dd
         if (m) return `${m[1]}-${m[2]}-${m[3]}`;
-        // Nếu chuỗi có "/", giả sử DD/MM/YYYY
         if (s.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
-          const [d,m,y] = s.split('/');
-          return `${y}-${m.padStart(2,'0')}-${d.padStart(2,'0')}`;
-        }
-        // Nếu đã là yyyy-mm-dd
-        if (s.match(/^\d{4}-\d{2}-\d{2}$/)) {
-          return s;
+          const [d, mth, y] = s.split('/');
+          return `${y}-${mth.padStart(2,'0')}-${d.padStart(2,'0')}`;
         }
       }
-      // Nếu là Date object
-      if (s instanceof Date && !isNaN(s)) {
-        return s.toISOString().slice(0,10);
-      }
+      if (s instanceof Date && !isNaN(s)) return s.toISOString().slice(0,10);
       return '';
-    }
-
-    // ==== Helper: Đổi ngày về dd/mm/yyyy để hiển thị ====
-    function toDisplayDate(s) {
-      if (!s) return '';
-      if (typeof s === 'string') {
-        // ISO dạng 2025-05-22T...
-        let m = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
-        if (m) return `${m[3]}/${m[2]}/${m[1]}`;
-        // yyyy-mm-dd
-        m = s.match(/^(\d{4})-(\d{2})-(\d{2})$/);
-        if (m) return `${m[3]}/${m[2]}/${m[1]}`;
-        // dd/mm/yyyy (đã đúng chuẩn)
-        if (s.match(/^\d{2}\/\d{2}\/\d{4}$/)) return s;
-      }
-      // Nếu là đối tượng Date
-      if (s instanceof Date && !isNaN(s)) {
-        const d = s;
-        return `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
-      }
-      return s;
     }
 
     // ==== Load item từ sessionStorage ====
@@ -218,12 +187,12 @@
     } else vBox.textContent = 'Chưa update';
 
     // Date received & aging
-    document.getElementById('dateReceivedTxt').value = toDisplayDate(item['Date received']);
+    document.getElementById('dateReceivedTxt').value = toInputDate(item['Date received']);
     // Tính số ngày backlog
-    const recvDate = new Date(toInputDate(item['Date received']));
-    const days = isNaN(recvDate) ? 0 :
+    const recvDate = new Date(document.getElementById('dateReceivedTxt').value);
+    const days = isNaN(recvDate) ? '' :
       Math.floor((Date.now() - recvDate.getTime()) / 86400000);
-    document.getElementById('agingBadge').textContent = `${days} ngày`;
+    document.getElementById('agingBadge').textContent = days !== '' ? `${days} ngày` : '';
 
     // --- Fill Status ---
     const set = (id, val) => document.getElementById(id).value = val || '';
@@ -251,7 +220,7 @@
         'Feedback count':    document.getElementById('feedbackCount').value,
         'Last checked date': document.getElementById('lastChecked').value
       };
-      const isChanged = Object.keys(curr).some(k => toDisplayDate(curr[k]) !== orig[k]);
+      const isChanged = Object.keys(curr).some(k => curr[k] !== orig[k]);
       const today = new Date().toISOString().slice(0,10);
       const payload = { ...item };
       payload['Last checked'] = today;
@@ -270,13 +239,14 @@
     // ===== SAVE =====
     document.getElementById('saveBtn').addEventListener('click', async () => {
       const payload = { ...item };
-      payload['Created date']     = toDisplayDate(document.getElementById('createdDate').value);
-      payload['Final date']       = toDisplayDate(document.getElementById('finalDate').value);
+      payload['Created date']     = document.getElementById('createdDate').value;
+      payload['Final date']       = document.getElementById('finalDate').value;
       payload['CE Status']        = document.getElementById('ceStatus').value;
       payload['Reason dispute']   = document.getElementById('reasonDispute').value;
       payload['Feedback count']   = document.getElementById('feedbackCount').value;
-      payload['Last feedback']    = toDisplayDate(document.getElementById('lastFeedback').value);
-      payload['Last checked']     = toDisplayDate(document.getElementById('lastChecked').value);
+      payload['Last feedback']    = document.getElementById('lastFeedback').value;
+      payload['Last checked']     = document.getElementById('lastChecked').value;
+      // Date received không cho sửa, giữ nguyên
       await pushToSheet(payload);
       window.opener.postMessage(payload, '*');
       sessionStorage.removeItem('editItem');
