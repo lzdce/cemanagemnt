@@ -291,51 +291,75 @@
 
     // ===== Checked no feedback =====
     document.getElementById('noFeedbackBtn').addEventListener('click', async () => {
-      // Lấy giá trị hiện tại của các ô trong Status
-      const curr = {
-        'Created date':     document.getElementById('createdDate').value,
-        'Final date':       document.getElementById('finalDate').value,
-        'CE Status':        document.getElementById('ceStatus').value,
-        'Reason dispute':   document.getElementById('reasonDispute').value,
-        'Feedback count':   document.getElementById('feedbackCount').value,
-        'Last feedback':    document.getElementById('lastFeedback').value
-      };
-      // Kiểm tra thay đổi
-      const isChanged = Object.keys(curr).some(k => curr[k] !== orig[k]);
-      if (isChanged) {
-        if (confirm('Bạn đã change data, nếu bạn đồng ý bỏ data đã change chỉ update ngày last checked thì hãy nhấn đồng ý')) {
-          // Chỉ update Last checked
-          const today = new Date().toISOString().slice(0,10);
-          const payload = { ...item };
-          payload['Last checked'] = today;
-          await pushToSheet(payload);
-          window.opener.postMessage(payload, '*');
-          sessionStorage.removeItem('editItem');
-          window.close();
-          return;
-        } else {
-          // Cancel thì không làm gì cả
-          return;
-        }
-      } else {
-        // Không thay đổi gì, thì vẫn update last checked và date received
-        const today = new Date().toISOString().slice(0,10);
-        const payload = { ...item };
-        payload['Last checked'] = today;
-        payload['Date received'] = today;
-        await pushToSheet(payload);
-        window.opener.postMessage(payload, '*');
-        sessionStorage.removeItem('editItem');
-        window.close();
-      }
-    });
+  const ceStatus = document.getElementById('ceStatus').value;
+
+  // Chỉ cho phép nếu status là Created hoặc Being process
+  if (ceStatus !== 'Created' && ceStatus !== 'Being process') {
+    alert("Không thể cập nhật checked vì case chưa tạo hoặc đang đóng");
+    return;
+  }
+
+  // Lấy giá trị hiện tại của các ô trong Status
+  const curr = {
+    'Created date':     document.getElementById('createdDate').value,
+    'Final date':       document.getElementById('finalDate').value,
+    'CE Status':        document.getElementById('ceStatus').value,
+    'Reason dispute':   document.getElementById('reasonDispute').value,
+    'Feedback count':   document.getElementById('feedbackCount').value,
+    'Last feedback':    document.getElementById('lastFeedback').value
+  };
+  // Kiểm tra thay đổi
+  const isChanged = Object.keys(curr).some(k => curr[k] !== orig[k]);
+  if (isChanged) {
+    if (confirm('Bạn đã change data, nếu bạn đồng ý bỏ data đã change chỉ update ngày last checked thì hãy nhấn đồng ý')) {
+      // Chỉ update Last checked
+      const today = new Date().toISOString().slice(0,10);
+      const payload = { ...item };
+      payload['Last checked'] = today;
+      await pushToSheet(payload);
+      window.opener.postMessage(payload, '*');
+      sessionStorage.removeItem('editItem');
+      window.close();
+      return;
+    } else {
+      // Cancel thì không làm gì cả
+      return;
+    }
+  } else {
+    // Không thay đổi gì, thì vẫn update last checked và date received
+    const today = new Date().toISOString().slice(0,10);
+    const payload = { ...item };
+    payload['Last checked'] = today;
+    payload['Date received'] = today;
+    await pushToSheet(payload);
+    window.opener.postMessage(payload, '*');
+    sessionStorage.removeItem('editItem');
+    window.close();
+  }
+});
 
     // ===== SAVE =====
     document.getElementById('saveBtn').addEventListener('click', async () => {
       const ceStatus = document.getElementById('ceStatus').value;
       const reasonDispute = document.getElementById('reasonDispute').value.trim();
       const finalDateEl = document.getElementById('finalDate');
+      const createdDate = document.getElementById('createdDate').value.trim();
       const nowDDMMYYYY = toDisplayDate(new Date());
+    
+      // So sánh các trường để kiểm tra thay đổi
+      const curr = {
+        'Created date':     document.getElementById('createdDate').value,
+        'Final date':       document.getElementById('finalDate').value,
+        'CE Status':        ceStatus,
+        'Reason dispute':   reasonDispute,
+        'Feedback count':   document.getElementById('feedbackCount').value,
+        'Last feedback':    document.getElementById('lastFeedback').value
+      };
+      const isChanged = Object.keys(curr).some(k => curr[k] !== orig[k]);
+      if (!isChanged) {
+        alert("Bạn chưa thay đổi");
+        return;
+      }
     
       // Ràng buộc: Nếu status là Appeal reject/Appeal success mà chưa có Created date thì không cho save
       if (
@@ -346,7 +370,8 @@
         document.getElementById('ceStatus').focus();
         return;
       }
-      // Nếu CE Status là "Appeal success", "Appeal reject", "Do not claim", cập nhật final date = today
+    
+      // Cập nhật final date khi SAVE nếu cần
       if (
         ceStatus === 'Appeal success' ||
         ceStatus === 'Appeal reject' ||
@@ -364,6 +389,21 @@
         document.getElementById('reasonDispute').focus();
         return;
       }
+
+  const payload = { ...item };
+  payload['Created date']     = document.getElementById('createdDate').value;
+  payload['Final date']       = document.getElementById('finalDate').value;
+  payload['CE Status']        = ceStatus;
+  payload['Reason dispute']   = reasonDispute;
+  payload['Feedback count']   = document.getElementById('feedbackCount').value;
+  payload['Last feedback']    = toDisplayDate(document.getElementById('lastFeedback').value);
+  payload['Last checked']     = toDisplayDate(document.getElementById('lastChecked').value);
+
+  await pushToSheet(payload);
+  window.opener.postMessage(payload, '*');
+  sessionStorage.removeItem('editItem');
+  window.close();
+});
     
       const payload = { ...item };
       payload['Created date']     = document.getElementById('createdDate').value;
@@ -399,6 +439,7 @@
   </script>
 </body>
 </html>
+
 
 
 
