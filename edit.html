@@ -173,7 +173,6 @@
     const raw   = sessionStorage.getItem('editItem');
     if (!raw) { alert('Không tìm thấy dữ liệu'); window.close(); }
     const item  = JSON.parse(raw);
-    item._row=sheetRow['_row'];
     const orig  = {};   // Lưu giá trị gốc để so sánh
 
     // --- Fill Information ---
@@ -299,6 +298,7 @@
   </script>
 </body>
 </html>
+
 
 
 
