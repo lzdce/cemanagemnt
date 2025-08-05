@@ -133,7 +133,7 @@
 
         <div>
           <label class="block">Last checked</label>
-          <input type="date" id="lastChecked" class="w-full border rounded p-2" />
+          <input type="date" id="lastChecked" class="w-full border rounded p-2" readonly />
         </div>
 
       </div>
@@ -213,60 +213,74 @@
       const recvDate = new Date(dateReceivedISO);
       const now = new Date();
       if (!isNaN(recvDate)) {
-        // Đặt giờ về 0 cho cả 2 để tránh lệch ngày do chênh lệch múi giờ
-        recvDate.setHours(0,0,0,0);
-        now.setHours(0,0,0,0);
+        recvDate.setHours(0,0,0,0); now.setHours(0,0,0,0);
         aging = Math.floor((now - recvDate) / 86400000);
       }
     }
     document.getElementById('agingBadge').textContent = aging !== '' ? `${aging} ngày` : '';
 
     // --- Fill Status ---
-    const set = (id, val) => document.getElementById(id).value = toDisplayDate(val) || '';
-    set('briefCase',        item['Brief case']);
-    set('createdDate',      item['Created date']);
-    set('finalDate',        item['Final date']);
-    document.getElementById('ceStatus').value      = item['CE Status'] || '';
-    document.getElementById('reasonDispute').value = item['Reason dispute'] || '';
-    document.getElementById('feedbackCount').value = item['Feedback count'] || '';
-    document.getElementById('lastFeedback').value  = toInputDate(item['Last feedback']);
-    document.getElementById('lastChecked').value   = toInputDate(item['Last checked']);
+    document.getElementById('briefCase').value      = item['Brief case'] || '';
+    document.getElementById('createdDate').value    = toDisplayDate(item['Created date']);
+    document.getElementById('finalDate').value      = toDisplayDate(item['Final date']);
+    document.getElementById('ceStatus').value       = item['CE Status'] || '';
+    document.getElementById('reasonDispute').value  = item['Reason dispute'] || '';
+    document.getElementById('feedbackCount').value  = item['Feedback count'] || '';
+    document.getElementById('lastFeedback').value   = toInputDate(item['Last feedback']);
+    document.getElementById('lastChecked').value    = toInputDate(item['Last checked']);
 
     // Lưu orig để kiểm tra thay đổi
-    ['Created date','Final date','CE Status',
-     'Reason dispute','Feedback count','Last checked'
-    ].forEach(k => orig[k] = item[k] || '');
+    orig['Created date']    = document.getElementById('createdDate').value;
+    orig['Final date']      = document.getElementById('finalDate').value;
+    orig['CE Status']       = document.getElementById('ceStatus').value;
+    orig['Reason dispute']  = document.getElementById('reasonDispute').value;
+    orig['Feedback count']  = document.getElementById('feedbackCount').value;
+    orig['Last feedback']   = document.getElementById('lastFeedback').value;
 
     // ===== Checked no feedback =====
     document.getElementById('noFeedbackBtn').addEventListener('click', async () => {
+      // Lấy giá trị hiện tại của các ô trong Status
       const curr = {
-        'Created date':      document.getElementById('createdDate').value,
-        'Final date':        document.getElementById('finalDate').value,
-        'CE Status':         document.getElementById('ceStatus').value,
-        'Reason dispute':    document.getElementById('reasonDispute').value,
-        'Feedback count':    document.getElementById('feedbackCount').value,
-        'Last checked date': document.getElementById('lastChecked').value
+        'Created date':     document.getElementById('createdDate').value,
+        'Final date':       document.getElementById('finalDate').value,
+        'CE Status':        document.getElementById('ceStatus').value,
+        'Reason dispute':   document.getElementById('reasonDispute').value,
+        'Feedback count':   document.getElementById('feedbackCount').value,
+        'Last feedback':    document.getElementById('lastFeedback').value
       };
+      // Kiểm tra thay đổi
       const isChanged = Object.keys(curr).some(k => curr[k] !== orig[k]);
-      const today = new Date().toISOString().slice(0,10);
-      const payload = { ...item };
-      payload['Last checked'] = today;
-      if (!isChanged) {
-        payload['Date received'] = today;
+      if (isChanged) {
+        if (confirm('Bạn đã change data, nếu bạn đồng ý bỏ data đã change chỉ update ngày last checked thì hãy nhấn đồng ý')) {
+          // Chỉ update Last checked
+          const today = new Date().toISOString().slice(0,10);
+          const payload = { ...item };
+          payload['Last checked'] = today;
+          await pushToSheet(payload);
+          window.opener.postMessage(payload, '*');
+          sessionStorage.removeItem('editItem');
+          window.close();
+          return;
+        } else {
+          // Cancel thì không làm gì cả
+          return;
+        }
       } else {
-        const ok = confirm('Bạn đã change data, bạn có muốn bỏ qua data đã change và chỉ cập nhật Last checked không?');
-        if (!ok) return;
+        // Không thay đổi gì, thì vẫn update last checked và date received
+        const today = new Date().toISOString().slice(0,10);
+        const payload = { ...item };
+        payload['Last checked'] = today;
+        payload['Date received'] = today;
+        await pushToSheet(payload);
+        window.opener.postMessage(payload, '*');
+        sessionStorage.removeItem('editItem');
+        window.close();
       }
-      await pushToSheet(payload);
-      window.opener.postMessage(payload, '*');
-      sessionStorage.removeItem('editItem');
-      window.close();
     });
 
     // ===== SAVE =====
     document.getElementById('saveBtn').addEventListener('click', async () => {
       const payload = { ...item };
-      // Lưu ngày về format dd/mm/yyyy
       payload['Created date']     = document.getElementById('createdDate').value;
       payload['Final date']       = document.getElementById('finalDate').value;
       payload['CE Status']        = document.getElementById('ceStatus').value;
