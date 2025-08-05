@@ -339,21 +339,44 @@
 
     // ===== SAVE =====
     document.getElementById('saveBtn').addEventListener('click', async () => {
+      const ceStatus = document.getElementById('ceStatus').value;
+      const reasonDispute = document.getElementById('reasonDispute').value.trim();
+      const finalDateEl = document.getElementById('finalDate');
+      const nowDDMMYYYY = toDisplayDate(new Date());
+    
+      // Nếu CE Status là "Appeal success", "Appeal reject", "Do not claim", cập nhật final date = today
+      if (
+        ceStatus === 'Appeal success' ||
+        ceStatus === 'Appeal reject' ||
+        ceStatus === 'Do not claim'
+      ) {
+        finalDateEl.value = nowDDMMYYYY;
+      }
+    
+      // Nếu CE Status là "Appeal reject" hoặc "Do not claim" thì reason dispute không được để trống
+      if (
+        (ceStatus === "Appeal reject" || ceStatus === "Do not claim") &&
+        reasonDispute === ""
+      ) {
+        alert("Cập nhật reason dispute");
+        document.getElementById('reasonDispute').focus();
+        return;
+      }
+    
       const payload = { ...item };
       payload['Created date']     = document.getElementById('createdDate').value;
       payload['Final date']       = document.getElementById('finalDate').value;
-      payload['CE Status']        = document.getElementById('ceStatus').value;
-      payload['Reason dispute']   = document.getElementById('reasonDispute').value;
+      payload['CE Status']        = ceStatus;
+      payload['Reason dispute']   = reasonDispute;
       payload['Feedback count']   = document.getElementById('feedbackCount').value;
       payload['Last feedback']    = toDisplayDate(document.getElementById('lastFeedback').value);
       payload['Last checked']     = toDisplayDate(document.getElementById('lastChecked').value);
-
+    
       await pushToSheet(payload);
       window.opener.postMessage(payload, '*');
       sessionStorage.removeItem('editItem');
       window.close();
     });
-
     // ===== Push cập nhật lên server =====
     async function pushToSheet(obj) {
       if (!obj._row || obj._row === 0) {
@@ -374,3 +397,4 @@
   </script>
 </body>
 </html>
+
