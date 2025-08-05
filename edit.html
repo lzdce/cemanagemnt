@@ -337,6 +337,15 @@
       const finalDateEl = document.getElementById('finalDate');
       const nowDDMMYYYY = toDisplayDate(new Date());
     
+      // Ràng buộc: Nếu status là Appeal reject/Appeal success mà chưa có Created date thì không cho save
+      if (
+        (ceStatus === 'Appeal reject' || ceStatus === 'Appeal success') &&
+        createdDate === ""
+      ) {
+        alert("Case chưa được tạo, bạn đang cập nhật sai trạng thái");
+        document.getElementById('ceStatus').focus();
+        return;
+      }
       // Nếu CE Status là "Appeal success", "Appeal reject", "Do not claim", cập nhật final date = today
       if (
         ceStatus === 'Appeal success' ||
@@ -390,5 +399,6 @@
   </script>
 </body>
 </html>
+
 
 
