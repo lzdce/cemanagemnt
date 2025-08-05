@@ -1,4 +1,3 @@
-<!-- ✨ CE edit form – Date received readonly, Aging tính tự động -->
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -71,8 +70,8 @@
         </div>
 
         <div>
-          <label class="block">Date received (yyyy-mm-dd)</label>
-          <input type="date" id="dateReceivedTxt" class="w-full bg-gray-200 rounded p-2" readonly />
+          <label class="block">Date received (dd/mm/yyyy)</label>
+          <input id="dateReceivedTxt" class="w-full bg-gray-200 rounded p-2" readonly />
         </div>
 
         <div>
@@ -94,13 +93,13 @@
         </div>
 
         <div>
-          <label class="block">Created date</label>
-          <input type="date" id="createdDate" class="w-full border rounded p-2" />
+          <label class="block">Created date (dd/mm/yyyy)</label>
+          <input id="createdDate" class="w-full border rounded p-2" readonly />
         </div>
 
         <div>
-          <label class="block">Final date</label>
-          <input type="date" id="finalDate" class="w-full border rounded p-2" />
+          <label class="block">Final date (dd/mm/yyyy)</label>
+          <input id="finalDate" class="w-full border rounded p-2" readonly />
         </div>
 
         <div class="col-span-2">
@@ -142,11 +141,28 @@
   </div>
 
   <script>
-    // Đổi mọi kiểu ngày về yyyy-mm-dd cho input type="date"
+    // Hàm chuẩn hóa mọi loại ngày về dd/mm/yyyy
+    function toDisplayDate(s) {
+      if (!s) return '';
+      if (typeof s === 'string') {
+        // ISO (2025-05-22T17:00:00.000Z) hoặc yyyy-mm-dd
+        let m = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+        if (m) return `${m[3]}/${m[2]}/${m[1]}`;
+        // dd/mm/yyyy (đã đúng rồi)
+        if (s.match(/^\d{2}\/\d{2}\/\d{4}$/)) return s;
+      }
+      if (s instanceof Date && !isNaN(s)) {
+        const d = s;
+        return `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
+      }
+      return s;
+    }
+
+    // Đổi dd/mm/yyyy về yyyy-mm-dd để tạo new Date
     function toInputDate(s) {
       if (!s) return '';
       if (typeof s === 'string') {
-        let m = s.match(/^(\d{4})-(\d{2})-(\d{2})/); // ISO or yyyy-mm-dd
+        let m = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
         if (m) return `${m[1]}-${m[2]}-${m[3]}`;
         if (s.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
           const [d, mth, y] = s.split('/');
@@ -161,7 +177,7 @@
     const raw   = sessionStorage.getItem('editItem');
     if (!raw) { alert('Không tìm thấy dữ liệu'); window.close(); }
     const item  = JSON.parse(raw);
-    const orig  = {};   // Lưu giá trị gốc để so sánh
+    const orig  = {};
 
     // --- Fill Information ---
     document.getElementById('ownerName').value    = item['Owner name'] || '';
@@ -187,23 +203,34 @@
     } else vBox.textContent = 'Chưa update';
 
     // Date received & aging
-    document.getElementById('dateReceivedTxt').value = toInputDate(item['Date received']);
-    // Tính số ngày backlog
-    const recvDate = new Date(document.getElementById('dateReceivedTxt').value);
-    const days = isNaN(recvDate) ? '' :
-      Math.floor((Date.now() - recvDate.getTime()) / 86400000);
-    document.getElementById('agingBadge').textContent = days !== '' ? `${days} ngày` : '';
+    const dateReceivedDisp = toDisplayDate(item['Date received']);
+    document.getElementById('dateReceivedTxt').value = dateReceivedDisp;
+
+    // Tính aging backlog (now - date received)
+    let aging = '';
+    if (dateReceivedDisp) {
+      const dateReceivedISO = toInputDate(dateReceivedDisp);
+      const recvDate = new Date(dateReceivedISO);
+      const now = new Date();
+      if (!isNaN(recvDate)) {
+        // Đặt giờ về 0 cho cả 2 để tránh lệch ngày do chênh lệch múi giờ
+        recvDate.setHours(0,0,0,0);
+        now.setHours(0,0,0,0);
+        aging = Math.floor((now - recvDate) / 86400000);
+      }
+    }
+    document.getElementById('agingBadge').textContent = aging !== '' ? `${aging} ngày` : '';
 
     // --- Fill Status ---
-    const set = (id, val) => document.getElementById(id).value = val || '';
+    const set = (id, val) => document.getElementById(id).value = toDisplayDate(val) || '';
     set('briefCase',        item['Brief case']);
-    set('createdDate',      toInputDate(item['Created date']));
-    set('finalDate',        toInputDate(item['Final date']));
-    set('ceStatus',         item['CE Status']);
-    set('reasonDispute',    item['Reason dispute']);
-    set('feedbackCount',    item['Feedback count']);
-    set('lastFeedback',     toInputDate(item['Last feedback']));
-    set('lastChecked',      toInputDate(item['Last checked']));
+    set('createdDate',      item['Created date']);
+    set('finalDate',        item['Final date']);
+    document.getElementById('ceStatus').value      = item['CE Status'] || '';
+    document.getElementById('reasonDispute').value = item['Reason dispute'] || '';
+    document.getElementById('feedbackCount').value = item['Feedback count'] || '';
+    document.getElementById('lastFeedback').value  = toInputDate(item['Last feedback']);
+    document.getElementById('lastChecked').value   = toInputDate(item['Last checked']);
 
     // Lưu orig để kiểm tra thay đổi
     ['Created date','Final date','CE Status',
@@ -239,14 +266,15 @@
     // ===== SAVE =====
     document.getElementById('saveBtn').addEventListener('click', async () => {
       const payload = { ...item };
+      // Lưu ngày về format dd/mm/yyyy
       payload['Created date']     = document.getElementById('createdDate').value;
       payload['Final date']       = document.getElementById('finalDate').value;
       payload['CE Status']        = document.getElementById('ceStatus').value;
       payload['Reason dispute']   = document.getElementById('reasonDispute').value;
       payload['Feedback count']   = document.getElementById('feedbackCount').value;
-      payload['Last feedback']    = document.getElementById('lastFeedback').value;
-      payload['Last checked']     = document.getElementById('lastChecked').value;
-      // Date received không cho sửa, giữ nguyên
+      payload['Last feedback']    = toDisplayDate(document.getElementById('lastFeedback').value);
+      payload['Last checked']     = toDisplayDate(document.getElementById('lastChecked').value);
+
       await pushToSheet(payload);
       window.opener.postMessage(payload, '*');
       sessionStorage.removeItem('editItem');
