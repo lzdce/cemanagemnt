@@ -287,7 +287,7 @@
         allData = await fetchAllData();
       }
       // Lọc theo ID
-      foundCases = allData.filter(i => (i['ID']+'').toLowerCase() === searchId.toLowerCase());
+      foundCases = allData.filter(i => String(i['ID']).trim() === searchId.trim());
       if (!foundCases.length) {
         showToast("Không tìm thấy ID này", "error"); return;
       }
