@@ -150,15 +150,30 @@
 
   <script>
     /***** Helpers *****/
-    const toInputDate = s => {
-      if (!s) return '';
-      // nếu chuỗi có "/", giả sử DD/MM/YYYY
-      if (s.includes('/')) {
-        const [d,m,y] = s.split('/');
-        return `${y}-${m.padStart(2,'0')}-${d.padStart(2,'0')}`;
-      }
-      return s; // đã là yyyy-mm-dd
-    };
+  const toInputDate = s => {
+  if (!s) return '';
+  if (typeof s === 'string') {
+    // Nếu là ISO date dạng 2025-05-22T17:00:00.000Z
+    if (s.match(/^\d{4}-\d{2}-\d{2}T/)) {
+      // Cắt lấy phần yyyy-mm-dd
+      return s.slice(0,10);
+    }
+    // Nếu chuỗi có "/", giả sử DD/MM/YYYY
+    if (s.includes('/')) {
+      const [d,m,y] = s.split('/');
+      return `${y}-${m.padStart(2,'0')}-${d.padStart(2,'0')}`;
+    }
+    // Nếu đã là yyyy-mm-dd
+    if (s.match(/^\d{4}-\d{2}-\d{2}$/)) {
+      return s;
+    }
+  }
+  // Nếu là Date object
+  if (s instanceof Date && !isNaN(s)) {
+    return s.toISOString().slice(0,10);
+  }
+  return '';
+};
     const toDisplayDate = s => {
       if (!s) return '';
       // nếu đã yyyy-mm-dd, chuyển ngược lại
@@ -298,6 +313,7 @@
   </script>
 </body>
 </html>
+
 
 
 
